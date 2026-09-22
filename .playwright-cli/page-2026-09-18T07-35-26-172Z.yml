@@ -1,0 +1,249 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "RIL home" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: RIL Audience Intelligence
+        - navigation "Primary" [ref=e12]:
+          - link "The bench" [ref=e13] [cursor=pointer]:
+            - /url: "#bench"
+          - link "The gate" [ref=e14] [cursor=pointer]:
+            - /url: "#gate"
+          - link "Seasons" [ref=e15] [cursor=pointer]:
+            - /url: "#seasons"
+          - link "The field" [ref=e16] [cursor=pointer]:
+            - /url: "#field"
+        - generic [ref=e17]:
+          - link "Sign in" [ref=e18] [cursor=pointer]:
+            - /url: /sign-in
+          - link "Start trial" [ref=e19] [cursor=pointer]:
+            - /url: /sign-up
+    - main [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]: Friday, 18 September 2026 · Public overview
+        - generic [ref=e25]: Synthetic demo · Illustrative counts
+      - region [ref=e26]:
+        - generic [ref=e27]:
+          - heading "AI recommends. You transplant only what holds." [level=1] [ref=e28]
+          - paragraph [ref=e29]: Audience Intelligence gathers audience data, behavior analysis, content assets, and leads per segment. Patterns are detected deterministically and wait in the tray as PENDING_REVIEW — only APPROVED insights are ever transplanted to recommendations.
+          - generic [ref=e30]:
+            - link "Start trial" [ref=e31] [cursor=pointer]:
+              - /url: /sign-up
+            - link "Open Command Centre" [ref=e34] [cursor=pointer]:
+              - /url: /sign-in
+        - generic "Working nursery bench preview" [ref=e35]:
+          - generic "Transplant queue" [ref=e36]:
+            - generic [ref=e37]:
+              - paragraph [ref=e38]: Transplant queue · 3 synthetic trays
+              - generic [ref=e39]: Synthetic
+            - list [ref=e40]:
+              - listitem [ref=e41]:
+                - generic [ref=e42]:
+                  - generic [ref=e43]:
+                    - generic [ref=e44]: Tray 01
+                    - generic [ref=e45]: Pending review
+                  - paragraph [ref=e47]: First-time buyers stall after second visit
+                  - paragraph [ref=e48]: Synthetic demo — detected across 2 segments, awaiting your hand.
+                - link "Review First-time buyers stall after second visit" [ref=e49] [cursor=pointer]:
+                  - /url: /sign-in
+                  - text: Review
+              - listitem [ref=e52]:
+                - generic [ref=e53]:
+                  - generic [ref=e54]:
+                    - generic [ref=e55]: Tray 02
+                    - generic [ref=e56]: Approved
+                  - paragraph [ref=e58]: Repeat readers convert on registration links
+                  - paragraph [ref=e59]: Synthetic demo — approved, transplanted to repurposing beds.
+                - link "Open Repeat readers convert on registration links" [ref=e60] [cursor=pointer]:
+                  - /url: /sign-in
+                  - text: Open
+              - listitem [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]:
+                    - generic [ref=e66]: Tray 03
+                    - generic [ref=e67]: Suppressed
+                  - paragraph [ref=e69]: Discount-chasing spike with no retention
+                  - paragraph [ref=e70]: Synthetic demo — suppressed, composted. Never recommended.
+                - link "Open Discount-chasing spike with no retention" [ref=e71] [cursor=pointer]:
+                  - /url: /sign-in
+                  - text: Open
+          - complementary "Bed plan" [ref=e74]:
+            - paragraph [ref=e75]: Bed plan · Sign in for yours
+            - heading "What got planted this week" [level=2] [ref=e76]
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - term [ref=e79]: Segments under glass
+                - definition [ref=e80]: "6"
+              - generic [ref=e81]:
+                - term [ref=e82]: Awaiting your hand
+                - definition [ref=e83]: "3"
+              - generic [ref=e84]:
+                - term [ref=e85]: Transplanted
+                - definition [ref=e86]: "11"
+              - generic [ref=e87]:
+                - term [ref=e88]: Composted
+                - definition [ref=e89]: "2"
+            - paragraph [ref=e90]: Pipeline holds 4 briefs in propagation. Next bed opens tomorrow, 9:00 AM — repurposing brief for the bootcamp keynote.
+            - generic [ref=e91]:
+              - link "Start trial" [ref=e92] [cursor=pointer]:
+                - /url: /sign-up
+              - link "Sign in" [ref=e95] [cursor=pointer]:
+                - /url: /sign-in
+      - generic [aria-hidden] [ref=e96]: TRANSPLANT
+      - region [ref=e97]:
+        - generic [ref=e98]:
+          - heading "The gate holds before anything spreads" [level=2] [ref=e99]
+          - paragraph [ref=e100]: Nothing auto-plants. Generation uses only activity facts and approved insights, labelled as suggestion and stored with its model label. Suppressed stays in the compost — out of every recommendation surface.
+        - generic [ref=e101]:
+          - generic "How the gate flows" [ref=e102]:
+            - generic [ref=e103]: Pending review
+            - generic [ref=e106]: Approved
+            - generic [ref=e109]: Recommended
+            - generic [ref=e110]: Suppressed is composted and never leaves the bench.
+          - generic [ref=e111]:
+            - paragraph [ref=e112]: status = 'APPROVED'
+            - paragraph [ref=e113]: The approval gate is enforced in SQL — getAudienceRecommendations reads approved rows only, not just the interface.
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - paragraph [ref=e116]: Grounded generation
+              - paragraph [ref=e120]: Activity fact plus approved insight becomes a suggestion. Every recommendation traces to its row.
+            - generic [ref=e121]:
+              - paragraph [ref=e122]: Human triage
+              - paragraph [ref=e126]: Approve, annotate, or suppress. Pending waits for your stamp; suppressed never reaches a bed.
+            - generic [ref=e127]:
+              - paragraph [ref=e128]: Graceful by default
+              - paragraph [ref=e136]: Missing org, data, or env renders a degraded bench with a named recovery path — never a blank field.
+      - region [ref=e137]:
+        - generic [ref=e138]:
+          - heading "One learning loop, nine seasons" [level=2] [ref=e139]
+          - paragraph [ref=e140]: Each pass through the content pipeline feeds the next segment signal. The sequence is the information — position nine only makes sense after one.
+        - list "Learning loop seasons" [ref=e142]:
+          - listitem [ref=e143]:
+            - generic [ref=e144]: "01"
+            - generic [ref=e145]: Audience Data
+            - generic [ref=e146]: Segments, behavior, assets, leads per segment
+          - listitem [ref=e147]:
+            - generic [ref=e148]: "02"
+            - generic [ref=e149]: Behaviour Analysis
+            - generic [ref=e150]: Deterministic pattern detection
+          - listitem [ref=e151]:
+            - generic [ref=e152]: "03"
+            - generic [ref=e153]: Audience Insight
+            - generic [ref=e154]: Lands as PENDING_REVIEW
+          - listitem [ref=e155]:
+            - generic [ref=e156]: "04"
+            - generic [ref=e157]: Content Recommendation
+            - generic [ref=e158]: Only APPROVED feeds forward
+          - listitem [ref=e159]:
+            - generic [ref=e160]: "05"
+            - generic [ref=e161]: Distribution
+            - generic [ref=e162]: Library approval + registration-link attribution
+          - listitem [ref=e163]:
+            - generic [ref=e164]: "06"
+            - generic [ref=e165]: Engagement
+            - generic [ref=e166]: Scheduled / published calendar
+          - listitem [ref=e167]:
+            - generic [ref=e168]: "07"
+            - generic [ref=e169]: Conversion
+            - generic [ref=e170]: CRM-lite follow-up, explainable scoring
+          - listitem [ref=e171]:
+            - generic [ref=e172]: "08"
+            - generic [ref=e173]: Performance Data
+            - generic [ref=e174]: KPIs, campaign rollups, tasks
+          - listitem [ref=e175]:
+            - generic [ref=e176]: "09"
+            - generic [ref=e177]: New Learning
+            - generic [ref=e178]: Each pass feeds the next segment signal
+      - region [ref=e179]:
+        - generic [ref=e180]:
+          - heading "A field an owner can trust" [level=2] [ref=e181]
+          - paragraph [ref=e182]: Command Centre ritual, provenance rows, and isolation by organization — scan the beds, stamp the pending, assign the approved to brief and calendar.
+        - generic [ref=e183]:
+          - generic [ref=e184]:
+            - heading "Approval tiers, isolated by organization" [level=3] [ref=e185]
+            - paragraph [ref=e186]: Owner and admin roles manage the workspace. Row-level isolation keeps every organization to its own segments, insights, assets, and leads. Detail pages return not-found for missing or foreign records.
+            - generic [ref=e187]:
+              - generic [ref=e188]: RLS isolated
+              - generic [ref=e189]: Roles enforced
+            - generic [ref=e190]:
+              - link "Start trial" [ref=e191] [cursor=pointer]:
+                - /url: /sign-up
+              - link "Sign in" [ref=e194] [cursor=pointer]:
+                - /url: /sign-in
+          - generic [ref=e195]:
+            - paragraph [ref=e196]: Provenance over polish
+            - paragraph [ref=e197]: Every recommendation shows its seed and soil
+            - paragraph [ref=e198]: Approved insight plus activity fact, labelled suggestion, model stored. Follow any bed back to the tray it grew from.
+            - link "Open the gate" [ref=e199] [cursor=pointer]:
+              - /url: /sign-in
+      - region [ref=e204]:
+        - generic [ref=e205]:
+          - heading "Everything it operates" [level=2] [ref=e206]
+          - generic [ref=e207]: 10 routes · Sign in to open
+        - list [ref=e209]:
+          - listitem [ref=e210]:
+            - link "/dashboard — Command Centre — tasks, KPIs, pipeline, schedule" [ref=e211] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e212]: /dashboard
+              - generic [ref=e213]: Command Centre — tasks, KPIs, pipeline, schedule
+          - listitem [ref=e214]:
+            - link "/audience/segments — Segments — audience management" [ref=e215] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e216]: /audience/segments
+              - generic [ref=e217]: Segments — audience management
+          - listitem [ref=e218]:
+            - link "/audience/insights — Insights — approve / annotate / suppress" [ref=e219] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e220]: /audience/insights
+              - generic [ref=e221]: Insights — approve / annotate / suppress
+          - listitem [ref=e222]:
+            - link "/audience/campaigns — Campaigns — rollups" [ref=e223] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e224]: /audience/campaigns
+              - generic [ref=e225]: Campaigns — rollups
+          - listitem [ref=e226]:
+            - link "/activities — Activities — repurposing briefs" [ref=e227] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e228]: /activities
+              - generic [ref=e229]: Activities — repurposing briefs
+          - listitem [ref=e230]:
+            - link "/library — Library — content approval pipeline" [ref=e231] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e232]: /library
+              - generic [ref=e233]: Library — content approval pipeline
+          - listitem [ref=e234]:
+            - link "/calendar — Calendar — scheduled / published" [ref=e235] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e236]: /calendar
+              - generic [ref=e237]: Calendar — scheduled / published
+          - listitem [ref=e238]:
+            - link "/leads — Leads — follow-up + scoring" [ref=e239] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e240]: /leads
+              - generic [ref=e241]: Leads — follow-up + scoring
+          - listitem [ref=e242]:
+            - link "/trends — Trends — manual intake inbox" [ref=e243] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e244]: /trends
+              - generic [ref=e245]: Trends — manual intake inbox
+          - listitem [ref=e246]:
+            - link "/settings/ai — AI settings — provider keys" [ref=e247] [cursor=pointer]:
+              - /url: /sign-in
+              - generic [ref=e248]: /settings/ai
+              - generic [ref=e249]: AI settings — provider keys
+      - region [ref=e250]:
+        - generic [ref=e251]:
+          - heading "Bring the bench. Keep the decision." [level=2] [ref=e252]
+          - paragraph [ref=e253]: Start a workspace, invite your approvers, and let only stamped intelligence reach content. Demonstration trays above are synthetic — your data stays isolated from day one.
+          - generic [ref=e254]:
+            - link "Start trial" [ref=e255] [cursor=pointer]:
+              - /url: /sign-up
+            - link "Sign in" [ref=e258] [cursor=pointer]:
+              - /url: /sign-in
+      - generic [ref=e260]:
+        - paragraph [ref=e261]: AI recommends, humans decide.
+        - paragraph [ref=e266]: RIL Audience Intelligence · Synthetic demo labelled
+  - alert [ref=e267]

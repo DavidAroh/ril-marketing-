@@ -1,0 +1,337 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f1e3]:
+    - banner [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - link "RIL home" [ref=f1e6] [cursor=pointer]:
+          - /url: /
+          - img "Renaissance Innovation Labs" [ref=f1e7]
+        - navigation "Primary" [ref=f1e8]:
+          - link "The gate" [ref=f1e9] [cursor=pointer]:
+            - /url: "#gate"
+          - link "How it runs" [ref=f1e10] [cursor=pointer]:
+            - /url: "#how"
+          - link "Questions" [ref=f1e11] [cursor=pointer]:
+            - /url: "#faq"
+        - generic [ref=f1e12]:
+          - link "Sign in" [ref=f1e13] [cursor=pointer]:
+            - /url: /sign-in
+          - link "Get started" [ref=f1e14] [cursor=pointer]:
+            - /url: /sign-up
+    - main [ref=f1e15]:
+      - region [ref=f1e16]:
+        - generic [ref=f1e19]:
+          - generic [ref=f1e20]:
+            - paragraph [ref=f1e22]: Audience intelligence, by Renaissance Innovation Labs
+            - heading "AI recommends. You decide." [level=1] [ref=f1e23]:
+              - generic [ref=f1e24]:
+                - generic [ref=f1e25]: AI recommends.
+                - generic [ref=f1e26]: You decide.
+            - paragraph [ref=f1e28]: Every segment, signal, and lead on one bench — nothing reaches your audience without your stamp.
+            - generic [ref=f1e30]:
+              - link "Get started" [ref=f1e31] [cursor=pointer]:
+                - /url: /sign-up
+                - text: Get started
+                - generic [aria-hidden] [ref=f1e32]: →
+              - link "Sign in" [ref=f1e33] [cursor=pointer]:
+                - /url: /sign-in
+            - generic [ref=f1e35]:
+              - generic [ref=f1e36]: Pending review
+              - generic [aria-hidden] [ref=f1e38]: →
+              - generic [ref=f1e39]: Approved
+              - generic [ref=f1e41]: — nothing ships unstamped
+          - complementary [ref=f1e42]:
+            - generic "This week, in view" [ref=f1e43]:
+              - generic [ref=f1e44]:
+                - generic [ref=f1e45]:
+                  - paragraph [ref=f1e46]: Review queue · this week
+                  - generic [ref=f1e47]: Live
+                - list [ref=f1e49]:
+                  - listitem [ref=f1e50]:
+                    - generic [ref=f1e51]: First-time buyers stall after second visit
+                    - generic [ref=f1e52]: Pending
+                  - listitem [ref=f1e54]:
+                    - generic [ref=f1e55]: Repeat readers convert on registration links
+                    - generic [ref=f1e56]: Approved
+                  - listitem [ref=f1e58]:
+                    - generic [ref=f1e59]: Discount-chasing spike with no retention
+                    - generic [ref=f1e60]: Suppressed
+                - generic [ref=f1e62]:
+                  - generic [ref=f1e63]:
+                    - definition [ref=f1e64]: "6"
+                    - term [ref=f1e65]: Segments
+                  - generic [ref=f1e66]:
+                    - definition [ref=f1e67]: "3"
+                    - term [ref=f1e68]: Waiting
+                  - generic [ref=f1e69]:
+                    - definition [ref=f1e70]: "11"
+                    - term [ref=f1e71]: Cleared
+                  - generic [ref=f1e72]:
+                    - definition [ref=f1e73]: "2"
+                    - term [ref=f1e74]: Set aside
+              - paragraph [ref=f1e75]: Illustrative counts. Your segments, briefs, and schedule appear here live after sign in.
+      - region "The promise" [ref=f1e76]:
+        - generic [aria-hidden]: GATE
+        - generic [ref=f1e77]:
+          - paragraph [ref=f1e78]: The promise
+          - paragraph [ref=f1e79]:
+            - generic [aria-hidden] [ref=f1e80]: Nothing
+            - generic [aria-hidden] [ref=f1e81]: reaches
+            - generic [aria-hidden] [ref=f1e82]: your
+            - generic [aria-hidden] [ref=f1e83]: audience
+            - generic [aria-hidden] [ref=f1e84]: until
+            - generic [aria-hidden] [ref=f1e85]: you
+            - generic [aria-hidden] [ref=f1e86]: say
+            - text: so.
+          - generic [ref=f1e88]:
+            - generic [ref=f1e89]:
+              - generic [ref=f1e90]: Pending review
+              - generic [ref=f1e93]: Approved
+              - generic [ref=f1e96]: Recommended
+              - generic [ref=f1e99]: Suppressed — set aside
+              - generic [ref=f1e102]: Every suggestion shows its source
+            - generic [ref=f1e105]:
+              - generic [ref=f1e106]: Pending review
+              - generic [ref=f1e109]: Approved
+              - generic [ref=f1e112]: Recommended
+              - generic [ref=f1e115]: Suppressed — set aside
+              - generic [ref=f1e118]: Every suggestion shows its source
+      - region [ref=f1e121]:
+        - generic [ref=f1e123]:
+          - generic [ref=f1e124]: "01"
+          - text: The gate
+        - generic [ref=f1e126]:
+          - heading "The gate holds before anything spreads." [level=2] [ref=f1e128]
+          - paragraph [ref=f1e130]: Generation uses only activity facts and approved insights. Suppressed stays out of every recommendation surface.
+        - generic [ref=f1e132]:
+          - generic [ref=f1e133]: PENDING REVIEW
+          - generic [aria-hidden] [ref=f1e135]: →
+          - generic [ref=f1e136]: APPROVED
+          - generic [aria-hidden] [ref=f1e138]: →
+          - generic [ref=f1e139]: Recommended
+          - generic [ref=f1e141]: Suppressed is set aside, and never leaves the bench.
+        - generic [ref=f1e143]:
+          - code [ref=f1e144]: status = 'APPROVED'
+          - paragraph [ref=f1e145]: The approval gate lives in the query, not the screen. Recommendations read approved rows only.
+        - generic "Synthetic review queue" [ref=f1e146]:
+          - article [ref=f1e148]:
+            - generic [ref=f1e149]:
+              - generic [ref=f1e150]: Tray 01
+              - generic [ref=f1e151]: PENDING REVIEW
+            - heading "First-time buyers stall after second visit" [level=3] [ref=f1e153]
+            - paragraph [ref=f1e154]: Spotted across 2 segments. Waiting for your call.
+          - article [ref=f1e156]:
+            - generic [ref=f1e157]:
+              - generic [ref=f1e158]: Tray 02
+              - generic [ref=f1e159]: APPROVED
+            - heading "Repeat readers convert on registration links" [level=3] [ref=f1e161]
+            - paragraph [ref=f1e162]: Approved and cleared for repurposing.
+          - article [ref=f1e164]:
+            - generic [ref=f1e165]:
+              - generic [ref=f1e166]: Tray 03
+              - generic [ref=f1e167]: SUPPRESSED
+            - heading "Discount-chasing spike with no retention" [level=3] [ref=f1e169]
+            - paragraph [ref=f1e170]: Suppressed. Never recommended.
+        - generic [ref=f1e171]:
+          - generic [ref=f1e173]:
+            - heading "Grounded generation" [level=3] [ref=f1e174]
+            - paragraph [ref=f1e175]: Every suggestion traces to an approved row.
+          - generic [ref=f1e177]:
+            - heading "Human triage" [level=3] [ref=f1e178]
+            - paragraph [ref=f1e179]: You approve, annotate, or suppress. Nothing auto-publishes.
+          - generic [ref=f1e181]:
+            - heading "Graceful by default" [level=3] [ref=f1e182]
+            - paragraph [ref=f1e183]: Missing data renders a clear bench, never a blank page.
+        - link "Sign in to review the queue →" [ref=f1e185] [cursor=pointer]:
+          - /url: /sign-in
+      - region [ref=f1e186]:
+        - generic [ref=f1e188]:
+          - generic [ref=f1e189]: "02"
+          - text: In view
+        - generic [ref=f1e191]:
+          - heading "A week on the bench." [level=2] [ref=f1e193]
+          - paragraph [ref=f1e195]: Scheduled posts, waiting drafts, and where leads come from — one glance.
+        - generic "Synthetic demo week" [ref=f1e197]:
+          - generic [ref=f1e198]:
+            - generic [ref=f1e199]:
+              - generic [ref=f1e200]: Mon
+              - generic [ref=f1e201]: LI
+              - generic [ref=f1e202]: EM
+            - generic [ref=f1e203]:
+              - generic [ref=f1e204]: Tue
+              - generic [ref=f1e205]: IG
+              - generic [ref=f1e206]: X
+              - generic [ref=f1e207]: LI
+            - generic [ref=f1e208]:
+              - generic [ref=f1e209]: Wed
+              - generic [ref=f1e210]: BL
+            - generic [ref=f1e211]:
+              - generic [ref=f1e212]: Thu
+              - generic [ref=f1e213]: LI
+              - generic [ref=f1e214]: IG
+              - generic [ref=f1e215]: EM
+            - generic [ref=f1e216]:
+              - generic [ref=f1e217]: Fri
+              - generic [ref=f1e218]: X
+              - generic [ref=f1e219]: LI
+            - generic [ref=f1e220]: Sat
+            - generic [ref=f1e222]:
+              - generic [ref=f1e223]: Sun
+              - generic [ref=f1e224]: EM
+          - generic [ref=f1e225]:
+            - generic [ref=f1e226]:
+              - paragraph [ref=f1e227]: Leads by channel
+              - paragraph [ref=f1e228]: 127 this month
+            - generic [ref=f1e229]:
+              - generic [ref=f1e230]:
+                - generic [ref=f1e231]: LinkedIn
+                - generic [ref=f1e234]: "48"
+              - generic [ref=f1e235]:
+                - generic [ref=f1e236]: Instagram
+                - generic [ref=f1e239]: "22"
+              - generic [ref=f1e240]:
+                - generic [ref=f1e241]: Email
+                - generic [ref=f1e244]: "19"
+              - generic [ref=f1e245]:
+                - generic [ref=f1e246]: X
+                - generic [ref=f1e249]: "12"
+        - paragraph [ref=f1e251]: Synthetic demo week. Your schedule, channels, and counts appear here live after sign in.
+      - region [ref=f1e252]:
+        - generic [ref=f1e254]:
+          - generic [ref=f1e255]: "03"
+          - text: How it runs
+        - heading "Running in an afternoon." [level=2] [ref=f1e258]
+        - paragraph [ref=f1e260]: Three short steps and the bench starts working for you.
+        - list [ref=f1e261]:
+          - listitem [ref=f1e262]:
+            - generic [ref=f1e263]:
+              - generic [ref=f1e264]: "01"
+              - heading "Sign up and name your team" [level=3] [ref=f1e265]
+              - paragraph [ref=f1e266]: One minute, email only. No credit card.
+          - listitem [ref=f1e267]:
+            - generic [ref=f1e268]:
+              - generic [ref=f1e269]: "02"
+              - heading "Log an activity, describe an audience" [level=3] [ref=f1e270]
+              - paragraph [ref=f1e271]: The dashboard guides all three getting started steps.
+          - listitem [ref=f1e272]:
+            - generic [ref=f1e273]:
+              - generic [ref=f1e274]: "03"
+              - heading "Review suggestions, approve what holds" [level=3] [ref=f1e275]
+              - paragraph [ref=f1e276]: Approved items feed drafts, calendar, and reports.
+        - generic [ref=f1e278]:
+          - generic [ref=f1e279]:
+            - heading "One learning loop, four moves." [level=3] [ref=f1e280]
+            - generic [ref=f1e281]: Listen → Decide → Publish → Learn
+          - list [ref=f1e282]:
+            - listitem [ref=f1e283]:
+              - generic [ref=f1e284]: A
+              - paragraph [ref=f1e285]: Listen
+              - paragraph [ref=f1e286]: Audience data + behaviour analysis land as PENDING_REVIEW.
+            - listitem [ref=f1e287]:
+              - generic [ref=f1e288]: B
+              - paragraph [ref=f1e289]: Decide
+              - paragraph [ref=f1e290]: You approve, annotate, or suppress. Only APPROVED moves on.
+            - listitem [ref=f1e291]:
+              - generic [ref=f1e292]: C
+              - paragraph [ref=f1e293]: Publish
+              - paragraph [ref=f1e294]: Recommendations → distribution → engagement → conversion, attributed.
+            - listitem [ref=f1e295]:
+              - generic [ref=f1e296]: D
+              - paragraph [ref=f1e297]: Learn
+              - paragraph [ref=f1e298]: Performance data becomes new learning for the next segment signal.
+      - region [ref=f1e299]:
+        - generic [ref=f1e300]:
+          - generic [ref=f1e302]:
+            - generic [ref=f1e303]: "04"
+            - text: Trust
+          - generic [ref=f1e305]:
+            - generic [ref=f1e306]:
+              - heading "A bench an owner can trust." [level=2] [ref=f1e308]
+              - paragraph [ref=f1e310]: Owner and admin roles run the workspace. Row-level isolation keeps every organisation to its own data.
+              - generic [ref=f1e312]:
+                - link "Get started" [ref=f1e313] [cursor=pointer]:
+                  - /url: /sign-up
+                  - text: Get started
+                  - generic [aria-hidden] [ref=f1e314]: →
+                - link "Sign in" [ref=f1e315] [cursor=pointer]:
+                  - /url: /sign-in
+            - generic [ref=f1e316]:
+              - list [ref=f1e317]:
+                - listitem [ref=f1e318]:
+                  - generic [ref=f1e320]: Human approval required on every insight
+                - listitem [ref=f1e321]:
+                  - generic [ref=f1e323]: Your team's data stays isolated
+                - listitem [ref=f1e324]:
+                  - generic [ref=f1e326]: Works with or without an AI key
+              - paragraph [ref=f1e329]: Every recommendation shows its source.
+      - region [ref=f1e330]:
+        - generic [ref=f1e332]:
+          - generic [ref=f1e333]: "05"
+          - text: Questions
+        - generic [ref=f1e335]:
+          - heading "Asked before you ask." [level=2] [ref=f1e337]
+          - generic [ref=f1e339]:
+            - group [ref=f1e341]:
+              - generic "Do I need a credit card to start?" [ref=f1e342] [cursor=pointer]:
+                - text: Do I need a credit card to start?
+                - generic [aria-hidden] [ref=f1e343]: +
+            - group [ref=f1e345]:
+              - generic "Does the AI publish anything on its own?" [ref=f1e346] [cursor=pointer]:
+                - text: Does the AI publish anything on its own?
+                - generic [aria-hidden] [ref=f1e347]: +
+            - group [ref=f1e349]:
+              - generic "Which AI providers can I use?" [ref=f1e350] [cursor=pointer]:
+                - text: Which AI providers can I use?
+                - generic [aria-hidden] [ref=f1e351]: +
+            - group [ref=f1e353]:
+              - generic "Is my team's data visible to anyone else?" [ref=f1e354] [cursor=pointer]:
+                - text: Is my team's data visible to anyone else?
+                - generic [aria-hidden] [ref=f1e355]: +
+      - region [ref=f1e356]:
+        - generic [aria-hidden]: GROW
+        - generic [ref=f1e357]:
+          - paragraph [ref=f1e359]: Start today
+          - heading "You decide what grows." [level=2] [ref=f1e361]
+          - paragraph [ref=f1e363]: Start a workspace, invite your approvers, and let only stamped intelligence reach content. Your data stays isolated from day one. Demo trays are synthetic.
+          - generic [ref=f1e365]:
+            - link "Get started" [ref=f1e366] [cursor=pointer]:
+              - /url: /sign-up
+              - text: Get started
+              - generic [aria-hidden] [ref=f1e367]: →
+            - link "Sign in" [ref=f1e368] [cursor=pointer]:
+              - /url: /sign-in
+    - contentinfo "Footer" [ref=f1e369]:
+      - generic [ref=f1e370]:
+        - generic [ref=f1e371]:
+          - generic [ref=f1e372]:
+            - link "Renaissance Innovation Labs home" [ref=f1e373] [cursor=pointer]:
+              - /url: /
+              - img "Renaissance Innovation Labs" [ref=f1e374]
+            - paragraph [ref=f1e375]: AI recommends. You decide.
+            - paragraph [ref=f1e376]: "Built in Port Harcourt, Nigeria, in the open lab spirit: collaboration, community, and trust."
+          - navigation "Footer" [ref=f1e377]:
+            - generic [ref=f1e378]:
+              - paragraph [ref=f1e379]: On this page
+              - link "The gate" [ref=f1e380] [cursor=pointer]:
+                - /url: "#gate"
+              - link "How it runs" [ref=f1e381] [cursor=pointer]:
+                - /url: "#how"
+              - link "Questions" [ref=f1e382] [cursor=pointer]:
+                - /url: "#faq"
+            - generic [ref=f1e383]:
+              - paragraph [ref=f1e384]: Workspace
+              - link "Sign in" [ref=f1e385] [cursor=pointer]:
+                - /url: /sign-in
+              - link "Get started" [ref=f1e386] [cursor=pointer]:
+                - /url: /sign-up
+              - link "renaissancelabs.org" [ref=f1e387] [cursor=pointer]:
+                - /url: https://www.renaissancelabs.org
+        - generic [ref=f1e388]:
+          - paragraph [ref=f1e389]: © 2026 RIL Audience Intelligence. Synthetic demo, labelled.
+          - generic [ref=f1e390]:
+            - link "Privacy" [ref=f1e391] [cursor=pointer]:
+              - /url: https://www.renaissancelabs.org/privacy
+            - link "Terms" [ref=f1e392] [cursor=pointer]:
+              - /url: https://www.renaissancelabs.org/terms
+  - button "Open Next.js Dev Tools" [ref=f1e398] [cursor=pointer]

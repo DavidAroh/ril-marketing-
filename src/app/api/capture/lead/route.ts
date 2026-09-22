@@ -1,0 +1,141 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isRegistrationToken } from "@/lib/audience/guards";
+import { scoreLead } from "@/lib/leads/scoring";
+
+const captureSchema = z.object({
+  token: z.string().trim().max(64).optional().default(""),
+  email: z.string().trim().email("A valid email is required.").max(320),
+  name: z.string().trim().max(200).optional().default(""),
+  phone: z.string().trim().max(40).optional().default(""),
+  organisation: z.string().trim().max(200).optional().default(""),
+  interest: z.string().trim().max(500).optional().default(""),
+});
+
+// Best-effort per-instance throttle for the public endpoint. Production
+// deployments should add edge rate-limiting (e.g. Upstash) in front of this.
+const hits = new Map<string, { count: number; resetAt: number }>();
+function throttled(ip: string): boolean {
+  const now = Date.now();
+  const cur = hits.get(ip);
+  if (!cur || cur.resetAt < now) {
+    hits.set(ip, { count: 1, resetAt: now + 60_000 });
+    return false;
+  }
+  cur.count += 1;
+  return cur.count > 20;
+}
+
+/**
+ * POST /api/capture/lead — public lead capture (§6.14, §6.16).
+ * Optional registration token attributes the lead to the exact asset,
+ * channel, campaign and segment that produced it. No session required.
+ */
+export async function POST(request: Request) {
+  try {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    if (throttled(ip)) {
+      return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+    }
+
+    let body: unknown = null;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Expected a JSON body." }, { status: 400 });
+    }
+    const parsed = captureSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid lead." },
+        { status: 400 }
+      );
+    }
+    const d = parsed.data;
+    const admin = createAdminClient();
+
+    let organizationId: string | null = null;
+    let assetId: string | null = null;
+    let segmentId: string | null = null;
+    let platform: string | null = null;
+
+    if (d.token && isRegistrationToken(d.token)) {
+      const { data: link } = await admin
+        .from("registration_links")
+        .select(
+          "organization_id, channel, content_assets(id, campaign_id, audience_segment_id, platform)"
+        )
+        .eq("token", d.token)
+        .maybeSingle<{
+          organization_id: string;
+          channel: string;
+          content_assets: {
+            id: string;
+            campaign_id: string | null;
+            audience_segment_id: string | null;
+            platform: string | null;
+          } | null;
+        }>();
+      if (link?.content_assets) {
+        organizationId = link.organization_id;
+        assetId = link.content_assets.id;
+        segmentId = link.content_assets.audience_segment_id;
+        platform = link.content_assets.platform ?? link.channel;
+      }
+    }
+
+    if (!organizationId) {
+      return NextResponse.json(
+        { error: "A valid registration token is required." },
+        { status: 400 }
+      );
+    }
+
+    // Merge duplicates on email — never delete (§13).
+    const { data: existing } = await admin
+      .from("leads")
+      .select("id")
+      .eq("organization_id", organizationId)
+      .ilike("email", d.email)
+      .limit(1)
+      .maybeSingle<{ id: string }>();
+    if (existing) {
+      return NextResponse.json({ ok: true, leadId: existing.id, duplicate: true });
+    }
+
+    const { score, reason } = scoreLead({
+      is_qualified: false,
+      is_converted: false,
+      funnel_stage: "captured",
+      eventCount: 0,
+    });
+
+    const { data: lead, error } = await admin
+      .from("leads")
+      .insert({
+        organization_id: organizationId,
+        email: d.email,
+        name: d.name || null,
+        phone: d.phone || null,
+        organisation: d.organisation || null,
+        interest: d.interest || null,
+        funnel_stage: "captured",
+        audience_segment_id: segmentId,
+        source_platform: platform,
+        source_content_asset_id: assetId,
+        registration_token: d.token || null,
+        score,
+        score_reason: reason,
+      })
+      .select("id")
+      .single<{ id: string }>();
+    if (error || !lead) {
+      return NextResponse.json({ error: "Could not save lead." }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, leadId: lead.id });
+  } catch {
+    return NextResponse.json({ error: "Unexpected error." }, { status: 500 });
+  }
+}
