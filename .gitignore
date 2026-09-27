@@ -8,3 +8,10 @@ dist/
 supabase/.branches/
 supabase/.temp/
 coverage/
+
+# Debug/test artifacts
+.playwright-cli/
+.claude/
+/*.png
+dev-server-refresh.log
+dev-server-refresh-error.log
