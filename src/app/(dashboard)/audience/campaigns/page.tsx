@@ -4,6 +4,11 @@ import { listCampaignRollups } from "@/lib/audience/campaigns";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
 import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { listSegments } from "@/lib/audience/segments";
+import { CampaignCreate } from "@/components/audience/campaign-create";
+import { CampaignStatus } from "@/components/audience/campaign-status";
+import { CampaignEditor } from "@/components/audience/campaign-editor";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Campaigns" };
 
@@ -15,6 +20,9 @@ export default async function CampaignsPage() {
     ? await listCampaignRollups(orgId).catch(
         () => [] as Awaited<ReturnType<typeof listCampaignRollups>>
       )
+    : [];
+  const segments = orgId
+    ? await listSegments(orgId).catch(() => [])
     : [];
 
   return (
@@ -31,6 +39,8 @@ export default async function CampaignsPage() {
           quality rolled up against the campaign objective.
         </p>
       </div>
+
+      <CampaignCreate segments={segments.map(({ id, name }) => ({ id, name }))} />
 
       {campaigns.length === 0 ? (
         <EmptyState
@@ -54,6 +64,15 @@ export default async function CampaignsPage() {
                 </span>
               </div>
               <h2 className="text-base font-bold text-foreground">{c.name}</h2>
+              <p className="text-sm leading-6 text-muted-foreground">{c.objective || "No objective recorded yet."}</p>
+              <dl className="grid gap-x-5 gap-y-2 border-t border-border pt-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div><dt className="dateline">Target audience</dt><dd className="mt-0.5 text-sm text-foreground">{c.target_audience || c.segment_name || "Not defined"}</dd></div>
+                <div><dt className="dateline">Funnel stage</dt><dd className="mt-0.5 text-sm capitalize text-foreground">{c.funnel_stage.replaceAll("_", " ")}</dd></div>
+                <div><dt className="dateline">Channels</dt><dd className="mt-0.5 text-sm text-foreground">{c.channels.length ? c.channels.map((channel)=>channel.replaceAll("_", " ")).join(", ") : "Not selected"}</dd></div>
+                <div><dt className="dateline">Planned budget</dt><dd className="mt-0.5 text-sm tabular-nums text-foreground">{c.budget === null ? "Not set" : `${c.budget_currency} ${Number(c.budget).toLocaleString("en-NG", { maximumFractionDigits: 2 })}`}</dd></div>
+              </dl>
+              <CampaignStatus campaignId={c.id} status={c.status} />
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold"><Link href={`/library?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign content</Link><Link href={`/email?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign email</Link><Link href={`/audience/landing-pages?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign landing pages</Link></div>
               <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-border pt-3 sm:grid-cols-3 lg:grid-cols-6">
                 {[
                   { label: "Assets", value: String(c.assets) },
@@ -71,6 +90,7 @@ export default async function CampaignsPage() {
                   </div>
                 ))}
               </dl>
+              {c.status !== "completed" ? <CampaignEditor campaign={c} segments={segments.map(({id,name})=>({id,name}))} /> : null}
             </li>
           ))}
         </ul>

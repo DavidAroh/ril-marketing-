@@ -48,11 +48,19 @@ export async function listAssets(
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (filters.status && filters.status !== "all") query = query.eq("status", filters.status);
   if (filters.channel && filters.channel !== "all") query = query.eq("channel", filters.channel);
-  if (filters.activityId) query = query.eq("source_activity_id", filters.activityId);
-  if (filters.campaignId) query = query.eq("campaign_id", filters.campaignId);
+  if (filters.activityId && filters.activityId !== "all") query = query.eq("source_activity_id", filters.activityId);
+  if (filters.campaignId && filters.campaignId !== "all") query = query.eq("campaign_id", filters.campaignId);
   if (filters.q?.trim()) {
-    const q = filters.q.trim().replace(/[%_]/g, "");
-    query = query.or(`title.ilike.%${q}%,body.ilike.%${q}%`);
+    const terms = filters.q
+      .normalize("NFKC")
+      .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 6);
+    for (const term of terms) {
+      query = query.or(`title.ilike.%${term}%,body.ilike.%${term}%`);
+    }
   }
   const { data, error, count } = await query;
   if (error) throw new Error(`Failed to load assets: ${error.message}`);

@@ -32,9 +32,9 @@ export async function listCampaignRollups(
       .eq("organization_id", organizationId)
       .in("campaign_id", campaignIds)
       .limit(2000),
-    supabase
-      .from("leads")
-      .select("id, source_content_asset_id, is_qualified, is_converted")
+      supabase
+        .from("leads")
+        .select("id, source_content_asset_id, campaign_id, is_qualified, is_converted")
       .eq("organization_id", organizationId)
       .limit(5000),
   ]);
@@ -52,6 +52,7 @@ export async function listCampaignRollups(
   const leadRows = (leads ?? []) as Array<{
     id: string;
     source_content_asset_id: string | null;
+    campaign_id: string | null;
     is_qualified: boolean;
     is_converted: boolean;
   }>;

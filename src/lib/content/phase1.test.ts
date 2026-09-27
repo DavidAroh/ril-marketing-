@@ -24,8 +24,10 @@ describe("provider registry", () => {
       expect(isSupportedModel(key, def.defaultModel)).toBe(true);
       expect(isSupportedModel(key, "not-a-real-model")).toBe(false);
     }
-    expect(defaultModel("anthropic")).toBe("claude-sonnet-4-5");
-    expect(defaultModel("gemini")).toBe("gemini-2.5-flash");
+    // Defaults are pinned so a model refresh is always a deliberate edit.
+    expect(defaultModel("openai")).toBe("gpt-6-luna");
+    expect(defaultModel("anthropic")).toBe("claude-sonnet-5");
+    expect(defaultModel("gemini")).toBe("gemini-3.8-flash");
   });
 
   it("falls back to OpenAI on unknown keys", () => {

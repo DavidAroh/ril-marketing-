@@ -125,3 +125,38 @@ export async function setLeadQualified(
     return { ok: false, error: err instanceof Error ? err.message : "Unexpected error." };
   }
 }
+
+const followUpSchema = z.object({
+  title: z.string().trim().min(2).max(180),
+  due_at: z.string().optional().transform((value) => value || null),
+});
+
+export async function createLeadFollowUp(leadId: string, formData: FormData): Promise<ActionResult> {
+  try {
+    const organizationId = await requireOrganizationId();
+    if (!z.string().uuid().safeParse(leadId).success) return { ok: false, error: "Choose a valid lead." };
+    const parsed = followUpSchema.safeParse({ title: formData.get("title"), due_at: formData.get("due_at") ?? "" });
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the follow-up details." };
+    if (parsed.data.due_at && !/^\d{4}-\d{2}-\d{2}$/.test(parsed.data.due_at)) return { ok: false, error: "Choose a valid due date." };
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("lead_follow_ups").insert({ organization_id: organizationId, lead_id: leadId, title: parsed.data.title, due_at: parsed.data.due_at, created_by: user?.id ?? null });
+    if (error) return { ok: false, error: error.message };
+    revalidatePath(`/leads/${leadId}`);
+    revalidatePath("/leads");
+    return { ok: true };
+  } catch (err) { return { ok: false, error: err instanceof Error ? err.message : "Could not save follow-up." }; }
+}
+
+export async function completeLeadFollowUp(leadId: string, followUpId: string, complete: boolean): Promise<ActionResult> {
+  try {
+    const organizationId = await requireOrganizationId();
+    if (!z.string().uuid().safeParse(leadId).success || !z.string().uuid().safeParse(followUpId).success) return { ok: false, error: "Choose a valid follow-up." };
+    const supabase = await createClient();
+    const { error } = await supabase.from("lead_follow_ups").update({ completed_at: complete ? new Date().toISOString() : null }).eq("organization_id", organizationId).eq("lead_id", leadId).eq("id", followUpId);
+    if (error) return { ok: false, error: error.message };
+    revalidatePath(`/leads/${leadId}`);
+    revalidatePath("/leads");
+    return { ok: true };
+  } catch (err) { return { ok: false, error: err instanceof Error ? err.message : "Could not update follow-up." }; }
+}

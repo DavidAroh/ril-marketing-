@@ -1,5 +1,4 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireOrganizationId } from "@/lib/supabase/organization";
 import type {
@@ -18,6 +17,7 @@ import {
   isSupportedModel,
   type ProviderKey,
 } from "@/lib/ai/providers";
+import { decryptSecret } from "@/lib/crypto/secret-box";
 
 export type { ProviderKey };
 
@@ -41,14 +41,18 @@ export async function resolveAiConfig(
     };
   }
   try {
-    const supabase = await createClient();
+    // Use the server-only admin client here so protected background jobs can
+    // resolve a workspace key without relying on a request cookie session.
+    // Callers must first establish the workspace through their own auth/job gate.
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("integrations")
       .select("status, config")
       .eq("organization_id", organizationId)
       .eq("key", "ai")
       .maybeSingle<{ status: string; config: Record<string, string> }>();
-    const apiKey = data?.status === "connected" ? (data?.config?.apiKey ?? null) : null;
+    const stored = data?.status === "connected" ? (data?.config?.apiKey ?? "") : "";
+    const apiKey = stored ? decryptSecret(stored) || null : null;
     if (apiKey) {
       const def = getProvider(data?.config?.provider);
       const provider = def.key;
@@ -79,6 +83,170 @@ function buildLlm(config: ResolvedLlmConfig & { apiKey: string }): AiProvider {
     baseUrl: config.baseUrl ?? getProvider(config.provider).baseUrl,
     model: config.model,
   });
+}
+
+/** Provider-agnostic, grounded text completion used by the marketing assistant. */
+export async function completeWithConfiguredProvider(
+  organizationId: string,
+  system: string,
+  prompt: string
+): Promise<{ model: string; text: string } | null> {
+  const config = await resolveAiConfig(organizationId);
+  if (config.mode !== "llm" || !config.apiKey) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  try {
+    if (config.provider === "anthropic") {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": config.apiKey,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: config.model,
+          max_tokens: 1200,
+          temperature: 0.3,
+          system,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+      if (!response.ok) throw new Error(`Assistant provider returned HTTP ${response.status}.`);
+      const json = await response.json() as { content?: Array<{ text?: string }> };
+      const text = json.content?.find((block) => typeof block.text === "string")?.text?.trim();
+      if (!text) throw new Error("Assistant returned an empty response.");
+      return { model: config.model, text: text.slice(0, 12000) };
+    }
+    const response = await fetch(`${(config.baseUrl ?? getProvider(config.provider).baseUrl).replace(/\/$/, "")}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: config.model,
+        temperature: 0.3,
+        max_tokens: 1200,
+        messages: [{ role: "system", content: system }, { role: "user", content: prompt }],
+      }),
+    });
+    if (!response.ok) throw new Error(`Assistant provider returned HTTP ${response.status}.`);
+    const json = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const text = json.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error("Assistant returned an empty response.");
+    return { model: config.model, text: text.slice(0, 12000) };
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") throw new Error("Assistant request timed out. Try a shorter question.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Multimodal image understanding through the configured organization provider. */
+export async function analyzeImageWithConfiguredProvider(input: {
+  organizationId: string;
+  mimeType: "image/jpeg" | "image/png" | "image/webp";
+  base64: string;
+  system: string;
+  prompt: string;
+}): Promise<{ model: string; text: string } | null> {
+  const config = await resolveAiConfig(input.organizationId);
+  if (config.mode !== "llm" || !config.apiKey) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 60_000);
+  try {
+    let response: Response;
+    if (config.provider === "anthropic") {
+      response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "x-api-key": config.apiKey, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: config.model,
+          max_tokens: 1600,
+          temperature: 0.2,
+          system: input.system,
+          messages: [{ role: "user", content: [
+            { type: "text", text: input.prompt },
+            { type: "image", source: { type: "base64", media_type: input.mimeType, data: input.base64 } },
+          ] }],
+        }),
+      });
+    } else {
+      response = await fetch(`${(config.baseUrl ?? getProvider(config.provider).baseUrl).replace(/\/$/, "")}/chat/completions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: config.model,
+          temperature: 0.2,
+          max_tokens: 1600,
+          messages: [
+            { role: "system", content: input.system },
+            { role: "user", content: [
+              { type: "text", text: input.prompt },
+              { type: "image_url", image_url: { url: `data:${input.mimeType};base64,${input.base64}`, detail: "high" } },
+            ] },
+          ],
+        }),
+      });
+    }
+    if (!response.ok) throw new Error(`Configured AI provider returned HTTP ${response.status} while analyzing the image.`);
+    const json = await response.json() as {
+      content?: Array<{ text?: string }>;
+      choices?: Array<{ message?: { content?: string | Array<{ type?: string; text?: string }> } }>;
+    };
+    const raw = config.provider === "anthropic"
+      ? json.content?.find((block) => typeof block.text === "string")?.text
+      : json.choices?.[0]?.message?.content;
+    const text = typeof raw === "string" ? raw : Array.isArray(raw) ? raw.map((part) => part.text ?? "").join("\n") : "";
+    if (!text.trim()) throw new Error("Configured AI provider returned no image analysis.");
+    return { model: config.model, text: text.trim().slice(0, 12000) };
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") throw new Error("Image analysis timed out. Try again with a smaller image.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Audio/video understanding through the workspace's configured Gemini model. */
+export async function analyzeAudioVideoWithConfiguredProvider(input: {
+  organizationId: string;
+  mimeType: string;
+  base64: string;
+  prompt: string;
+  system: string;
+}): Promise<{ model: string; text: string } | null> {
+  const config = await resolveAiConfig(input.organizationId);
+  if (config.mode !== "llm" || config.provider !== "gemini" || !config.apiKey) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 120_000);
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(config.model)}:generateContent`, {
+      method: "POST",
+      headers: { "x-goog-api-key": config.apiKey, "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: input.system }] },
+        contents: [{ role: "user", parts: [{ text: input.prompt }, { inlineData: { mimeType: input.mimeType, data: input.base64 } }] }],
+        generationConfig: { temperature: 0.2, responseMimeType: "application/json" },
+      }),
+      cache: "no-store",
+      redirect: "error",
+    });
+    if (!response.ok) throw new Error(`Gemini returned HTTP ${response.status} while analyzing the media.`);
+    const json = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const text = json.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("\n").trim();
+    if (!text) throw new Error("Gemini returned an empty media analysis.");
+    return { model: config.model, text: text.slice(0, 60000) };
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") throw new Error("Media analysis took too long. Try a shorter clip.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -135,7 +303,7 @@ export async function getAiIntegration(organizationId: string): Promise<{
       config: Record<string, string>;
       updated_at: string;
     }>();
-  const storedKey = data?.config?.apiKey ?? "";
+  const storedKey = decryptSecret(data?.config?.apiKey ?? "");
   const provider = getProvider(data?.config?.provider);
   return {
     status: data?.status ?? "not_connected",
@@ -172,7 +340,7 @@ export async function testAiConnection(input: {
         .eq("organization_id", organizationId)
         .eq("key", "ai")
         .maybeSingle<{ config: Record<string, string> }>();
-      apiKey = data?.config?.apiKey ?? "";
+      apiKey = decryptSecret(data?.config?.apiKey ?? "");
     }
   }
   if (!apiKey && provider.key === getProvider(process.env.AI_PROVIDER).key) {

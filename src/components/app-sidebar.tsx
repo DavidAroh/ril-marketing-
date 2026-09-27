@@ -1,77 +1,54 @@
+import Link from "next/link";
+import Image from "next/image";
 import { LogoIcon } from "@/components/logo";
-import { Button } from "@/components/ui/button";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
-	SidebarGroup,
 	SidebarHeader,
-	SidebarMenu,
 	SidebarMenuButton,
-	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavGroup } from "@/components/nav-group";
-import { footerNavLinks, navGroups } from "@/components/app-shared";
-import { LatestChange } from "@/components/latest-change";
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { navGroups } from "@/components/app-shared";
 
 export function AppSidebar() {
 	return (
 		<Sidebar collapsible="icon" variant="inset">
 			<SidebarHeader className="h-14 justify-center">
-				<SidebarMenuButton asChild>
-					<a href="#link">
-						<LogoIcon />
-						<span className="font-medium">Efferd</span>
-					</a>
+				<SidebarMenuButton asChild tooltip="Renaissance Innovation Labs">
+					<Link href="/dashboard">
+						<LogoIcon className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block" aria-hidden="true" />
+						<Image
+							src="/logo/blackLogo.svg"
+							alt="Renaissance Innovation Labs"
+							width={128}
+							height={30}
+							priority
+							className="h-6 w-auto max-w-full dark:hidden group-data-[collapsible=icon]:hidden"
+						/>
+						<Image
+							src="/logo/whiteLogo.svg"
+							alt="Renaissance Innovation Labs"
+							width={128}
+							height={30}
+							priority
+							className="hidden h-6 w-auto max-w-full dark:block dark:group-data-[collapsible=icon]:hidden"
+						/>
+					</Link>
 				</SidebarMenuButton>
 			</SidebarHeader>
 			<SidebarContent>
-				<SidebarGroup>
-					<SidebarMenuItem className="flex items-center gap-2">
-						<SidebarMenuButton
-							className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-							tooltip="Quick Create"
-						>
-							<PlusIcon
-							/>
-							<span>New Conversation</span>
-						</SidebarMenuButton>
-						<Button
-							aria-label="Search conversations"
-							className="size-8 group-data-[collapsible=icon]:opacity-0"
-							size="icon"
-							variant="outline"
-						>
-							<SearchIcon
-							/>
-							<span className="sr-only">Search conversations</span>
-						</Button>
-					</SidebarMenuItem>
-				</SidebarGroup>
 				{navGroups.map((group, index) => (
 					<NavGroup key={`sidebar-group-${index}`} {...group} />
 				))}
 			</SidebarContent>
 			<SidebarFooter>
-				<LatestChange />
-				<SidebarMenu className="mt-2">
-					{footerNavLinks.map((item) => (
-						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton
-								asChild
-								className="text-muted-foreground"
-								isActive={item.isActive}
-								size="sm"
-							>
-								<a href={item.path}>
-									{item.icon}
-									<span>{item.title}</span>
-								</a>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-					))}
-				</SidebarMenu>
+				<div className="px-2 py-3 group-data-[collapsible=icon]:hidden">
+					<p className="dateline">Operating principle</p>
+					<p className="mt-1 text-sm font-medium leading-snug text-foreground">
+						AI recommends. <span className="text-primary">Humans decide.</span>
+					</p>
+				</div>
 			</SidebarFooter>
 		</Sidebar>
 	);

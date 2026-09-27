@@ -1,0 +1,24 @@
+- generic [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - main [ref=e3]:
+    - heading "RIL Audience Intelligence — authentication" [level=1] [ref=e4]
+    - generic [ref=e7]:
+      - heading "Sign in" [level=2] [ref=e11]
+      - paragraph [ref=e12]: Access your RIL audience workspace.
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - text: Email
+          - textbox "Email" [active] [ref=e16]:
+            - /placeholder: you@company.com
+        - generic [ref=e17]:
+          - text: Password
+          - generic [ref=e18]:
+            - textbox "Password" [ref=e19]
+            - button "Show password" [ref=e20]
+        - button "Login" [ref=e22]
+        - paragraph [ref=e23]:
+          - text: Don't have an account?
+          - link "Sign up" [ref=e24] [cursor=pointer]:
+            - /url: /sign-up
+  - button "Open Next.js Dev Tools" [ref=e30] [cursor=pointer]

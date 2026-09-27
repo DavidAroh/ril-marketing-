@@ -1,19 +1,53 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getOAuthProvider } from "@/lib/integrations/oauth";
+import {
+  codeChallengeFor,
+  getOAuthProvider,
+  newCodeVerifier,
+  newStateToken,
+} from "@/lib/integrations/oauth";
 
-export interface BufferTokens {
-  accessToken: string;
-  refreshToken: string | null;
-  expiresAt: string | null;
+/**
+ * Buffer connector, targeting the GraphQL API.
+ *
+ * Buffer retired its legacy REST API (`api.bufferapp.com/1/`) on 1 Feb 2027 and
+ * replaced it with a single GraphQL endpoint. Key differences that shape this
+ * module:
+ *   - One endpoint, always POST, body is `{ query, variables }`.
+ *   - Auth is a Bearer token (OAuth access token here; personal API keys also work).
+ *   - Buffer's "profiles" are now "channels".
+ *   - Errors come back as typed unions in the response body (`MutationError`),
+ *     not as HTTP status codes.
+ */
+
+const GRAPHQL_ENDPOINT = "https://api.buffer.com";
+
+export interface BufferChannel {
+  id: string;
+  /** The handle, e.g. "renaissancelabs". */
+  name: string;
+  displayName: string | null;
+  /** Lowercase service key, e.g. "linkedin", "instagram", "tiktok". */
+  service: string;
+  /** Page / Profile / Business / Group / Account. */
+  type: string;
+  /** Human label Buffer builds for us, e.g. "LinkedIn Page". */
+  descriptor: string;
+  avatar: string | null;
+  /** A paused queue silently stops scheduled posts from publishing. */
+  isQueuePaused: boolean;
+  isDisconnected: boolean;
+  isLocked: boolean;
 }
 
 interface StoredConfig {
   accessToken?: string | null;
   refreshToken?: string | null;
   expiresAt?: string | null;
-  pending?: { state: string; createdAt: string };
-  profiles?: Array<{ id: string; service: string; formattedUsername: string }>;
+  pending?: { state: string; createdAt: string; codeVerifier?: string };
+  channels?: BufferChannel[];
+  bufferOrganizationId?: string | null;
+  bufferOrganizationName?: string | null;
 }
 
 async function readConfig(
@@ -37,10 +71,7 @@ async function writeConfig(
 ): Promise<void> {
   const admin = createAdminClient();
   if (rowId) {
-    await admin
-      .from("integrations")
-      .update({ config, status })
-      .eq("id", rowId);
+    await admin.from("integrations").update({ config, status }).eq("id", rowId);
   } else {
     await admin.from("integrations").insert({
       organization_id: organizationId,
@@ -52,27 +83,186 @@ async function writeConfig(
   }
 }
 
-export function bufferEnv(): { clientId: string; clientSecret: string } | null {
+/**
+ * A client secret is optional: confidential clients (a server app that can
+ * keep a secret) get one, public clients authenticate with PKCE alone.
+ */
+export function bufferEnv(): { clientId: string; clientSecret: string | null } | null {
   const clientId = process.env.BUFFER_CLIENT_ID ?? "";
-  const clientSecret = process.env.BUFFER_CLIENT_SECRET ?? "";
-  return clientId && clientSecret ? { clientId, clientSecret } : null;
+  if (!clientId) return null;
+  return { clientId, clientSecret: process.env.BUFFER_CLIENT_SECRET || null };
 }
 
-/** Step 1 of connect: stage a single-use handshake, return its state. */
-export async function stageBufferHandshake(organizationId: string): Promise<string> {
-  const { randomUUID } = await import("node:crypto");
-  const state = randomUUID().replaceAll("-", "");
+interface GraphQlError {
+  message?: string;
+}
+
+/**
+ * One POST per call. Buffer returns 401 for a bad token and otherwise reports
+ * problems inside `errors`, so both paths have to be checked.
+ */
+async function bufferGraphQl<T>(
+  accessToken: string,
+  query: string,
+  variables?: Record<string, unknown>
+): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch {
+    throw new Error("Could not reach Buffer. Check the connection and try again.");
+  }
+
+  if (response.status === 401) {
+    throw new Error("Buffer didn't accept the connection. Reconnect in Settings.");
+  }
+  if (response.status === 429) {
+    throw new Error("Buffer is rate limiting this account. Try again shortly.");
+  }
+
+  const payload = (await response.json().catch(() => null)) as
+    | { data?: T; errors?: GraphQlError[] }
+    | null;
+
+  if (!response.ok) {
+    throw new Error(`Buffer returned HTTP ${response.status}.`);
+  }
+  const firstError = payload?.errors?.[0]?.message;
+  if (firstError) throw new Error(`Buffer rejected the request: ${firstError}`);
+  if (!payload?.data) throw new Error("Buffer returned an empty response.");
+  return payload.data;
+}
+
+const ACCOUNT_QUERY = `
+  query GetAccount {
+    account {
+      id
+      email
+      name
+      organizations {
+        id
+        name
+      }
+    }
+  }
+`;
+
+/**
+ * The organization ID is inlined rather than passed as a variable: Buffer types
+ * that field as its own `OrganizationId` scalar, and a `String!` variable would
+ * fail validation against it. This matches Buffer's own "Your First Post"
+ * guide, which also inlines the ID.
+ */
+function channelsQuery(organizationId: string): string {
+  return `
+  query GetChannels {
+    channels(input: { organizationId: ${JSON.stringify(organizationId)} }) {
+      id
+      name
+      displayName
+      service
+      type
+      descriptor
+      avatar
+      isQueuePaused
+      isDisconnected
+      isLocked
+    }
+  }
+`;
+}
+
+const CREATE_POST_MUTATION = `
+  mutation CreatePost($input: CreatePostInput!) {
+    createPost(input: $input) {
+      ... on PostActionSuccess {
+        post {
+          id
+          text
+          dueAt
+        }
+      }
+      ... on MutationError {
+        message
+      }
+    }
+  }
+`;
+
+interface BufferOrganization {
+  id: string;
+  name: string;
+}
+
+async function fetchOrganizations(
+  accessToken: string
+): Promise<BufferOrganization[]> {
+  const data = await bufferGraphQl<{
+    account: { organizations: BufferOrganization[] };
+  }>(accessToken, ACCOUNT_QUERY);
+  return data.account?.organizations ?? [];
+}
+
+/**
+ * Channels are listed per Buffer organization, and a Buffer account can hold
+ * several. The chosen organization is cached on the row so Settings loads
+ * without an extra round trip.
+ */
+async function resolveOrganization(
+  organizationId: string,
+  rowId: string | null,
+  config: StoredConfig,
+  accessToken: string
+): Promise<BufferOrganization> {
+  const organizations = await fetchOrganizations(accessToken);
+  if (organizations.length === 0) {
+    throw new Error("This Buffer account has no organization to connect.");
+  }
+  const cached = organizations.find((org) => org.id === config.bufferOrganizationId);
+  const chosen = cached ?? organizations[0];
+  if (chosen.id !== config.bufferOrganizationId) {
+    await writeConfig(
+      organizationId,
+      rowId,
+      {
+        ...config,
+        bufferOrganizationId: chosen.id,
+        bufferOrganizationName: chosen.name,
+      },
+      "connected"
+    );
+  }
+  return chosen;
+}
+
+/** Step 1 of connect: stage a single-use handshake, return state + PKCE challenge. */
+export async function stageBufferHandshake(
+  organizationId: string
+): Promise<{ state: string; codeChallenge: string }> {
+  const state = newStateToken();
+  const codeVerifier = newCodeVerifier();
   const { rowId, config } = await readConfig(organizationId);
   await writeConfig(
     organizationId,
     rowId,
-    { ...config, pending: { state, createdAt: new Date().toISOString() } },
+    {
+      ...config,
+      pending: { state, createdAt: new Date().toISOString(), codeVerifier },
+    },
     "not_connected"
   );
-  return state;
+  return { state, codeChallenge: codeChallengeFor(codeVerifier) };
 }
 
-/** Step 2 (callback): verify state once, exchange code, store tokens. */
+/** Step 2 (callback): verify state once, exchange code + verifier, store tokens. */
 export async function finishBufferHandshake(
   organizationId: string,
   state: string,
@@ -80,7 +270,11 @@ export async function finishBufferHandshake(
   redirectUri: string
 ): Promise<void> {
   const env = bufferEnv();
-  if (!env) throw new Error("Social publishing isn't switched on yet. Ask whoever set up your workspace to connect Buffer.");
+  if (!env) {
+    throw new Error(
+      "Social publishing isn't switched on yet. Ask whoever set up your workspace to connect Buffer."
+    );
+  }
   const { rowId, config } = await readConfig(organizationId);
   const pending = config.pending;
   const fresh =
@@ -88,25 +282,37 @@ export async function finishBufferHandshake(
     Number.isFinite(new Date(pending.createdAt).getTime()) &&
     Date.now() - new Date(pending.createdAt).getTime() <= 10 * 60_000;
   if (!fresh) throw new Error("Connect session expired. Start over from Settings.");
+  if (!pending?.codeVerifier) {
+    throw new Error("Connect session is incomplete. Start over from Settings.");
+  }
+
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: env.clientId,
+    redirect_uri: redirectUri,
+    code,
+    code_verifier: pending.codeVerifier,
+  });
+  if (env.clientSecret) body.set("client_secret", env.clientSecret);
 
   const res = await fetch(getOAuthProvider("buffer")!.tokenUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: env.clientId,
-      client_secret: env.clientSecret,
-      redirect_uri: redirectUri,
-      code,
-      grant_type: "authorization_code",
-    }).toString(),
+    body: body.toString(),
   });
-  if (!res.ok) throw new Error(`Buffer refused the code (HTTP ${res.status}).`);
-  const tokens = (await res.json()) as {
-    access_token?: string;
-    refresh_token?: string;
-    expires_in?: number;
-  };
-  if (!tokens.access_token) throw new Error("Buffer returned no access token.");
+  const tokens = (await res.json().catch(() => null)) as
+    | {
+        access_token?: string;
+        refresh_token?: string;
+        expires_in?: number;
+        error?: string;
+        error_description?: string;
+      }
+    | null;
+  if (!res.ok || !tokens?.access_token) {
+    const detail = tokens?.error_description ?? tokens?.error ?? `HTTP ${res.status}`;
+    throw new Error(`Buffer refused the connection (${detail}).`);
+  }
 
   const { pending: _drop, ...rest } = config;
   void _drop;
@@ -120,6 +326,10 @@ export async function finishBufferHandshake(
       expiresAt: tokens.expires_in
         ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
         : null,
+      // A reconnect must not reuse the previous account's organization.
+      bufferOrganizationId: null,
+      bufferOrganizationName: null,
+      channels: [],
     },
     "connected"
   );
@@ -136,28 +346,34 @@ async function refreshIfNeeded(
   if (valid) return config.accessToken as string;
 
   const env = bufferEnv();
-  if (!env || !config.refreshToken) {
+  if (!config.refreshToken) {
     throw new Error("Buffer connection expired. Reconnect in Settings.");
   }
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: config.refreshToken,
+  });
+  if (env?.clientId) body.set("client_id", env.clientId);
+  if (env?.clientSecret) body.set("client_secret", env.clientSecret);
+
   const res = await fetch(getOAuthProvider("buffer")!.tokenUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: env.clientId,
-      client_secret: env.clientSecret,
-      refresh_token: config.refreshToken,
-      grant_type: "refresh_token",
-    }).toString(),
+    body: body.toString(),
   });
-  if (!res.ok) throw new Error("Buffer refresh failed. Reconnect in Settings.");
-  const tokens = (await res.json()) as { access_token?: string; expires_in?: number };
-  if (!tokens.access_token) throw new Error("Buffer refresh returned no token.");
+  const tokens = (await res.json().catch(() => null)) as
+    | { access_token?: string; refresh_token?: string; expires_in?: number }
+    | null;
+  if (!res.ok || !tokens?.access_token) {
+    throw new Error("Buffer connection expired. Reconnect in Settings.");
+  }
   await writeConfig(
     organizationId,
     rowId,
     {
       ...config,
       accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token ?? config.refreshToken,
       expiresAt: tokens.expires_in
         ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
         : config.expiresAt ?? null,
@@ -167,96 +383,112 @@ async function refreshIfNeeded(
   return tokens.access_token;
 }
 
-async function bufferApi<T>(
-  organizationId: string,
-  path: string,
-  init?: RequestInit
-): Promise<T> {
-  const { rowId, config } = await readConfig(organizationId);
-  const token = await refreshIfNeeded(organizationId, rowId, config);
-  const res = await fetch(`https://api.buffer.com/1${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
-  if (res.status === 401) throw new Error("Buffer didn't accept the connection. Reconnect in Settings.");
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Buffer error HTTP ${res.status}: ${text.slice(0, 200)}`);
-  }
-  return (await res.json()) as T;
-}
-
-export interface BufferProfile {
-  id: string;
-  service: string;
-  formattedUsername: string;
+function toChannel(raw: Partial<BufferChannel> & { id: string }): BufferChannel {
+  return {
+    id: raw.id,
+    name: raw.name ?? "",
+    displayName: raw.displayName ?? null,
+    service: raw.service ?? "unknown",
+    type: raw.type ?? "",
+    descriptor: raw.descriptor ?? raw.service ?? "Channel",
+    avatar: raw.avatar ?? null,
+    isQueuePaused: Boolean(raw.isQueuePaused),
+    isDisconnected: Boolean(raw.isDisconnected),
+    isLocked: Boolean(raw.isLocked),
+  };
 }
 
 /** Connected channels, cached on the row so Settings loads instantly. */
-export async function getBufferProfiles(
+export async function getBufferChannels(
   organizationId: string
-): Promise<BufferProfile[]> {
+): Promise<BufferChannel[]> {
   const { rowId, config } = await readConfig(organizationId);
   if (!config.accessToken) throw new Error("Buffer is not connected.");
-  const json = await bufferApi<{ profiles?: BufferProfile[] }>(
+  const accessToken = await refreshIfNeeded(organizationId, rowId, config);
+  const organization = await resolveOrganization(
     organizationId,
-    "/profiles.json"
+    rowId,
+    { ...config, accessToken },
+    accessToken
   );
-  const profiles = (json.profiles ?? []).map((p) => ({
-    id: p.id,
-    service: p.service,
-    formattedUsername: p.formattedUsername ?? p.service,
-  }));
-  await writeConfig(organizationId, rowId, { ...config, profiles }, "connected");
-  return profiles;
+  const data = await bufferGraphQl<{ channels: BufferChannel[] }>(
+    accessToken,
+    channelsQuery(organization.id)
+  );
+  const channels = (data.channels ?? []).map(toChannel);
+  await writeConfig(organizationId, rowId, { ...config, accessToken, channels }, "connected");
+  return channels;
 }
 
-export function cachedBufferProfiles(config: StoredConfig): BufferProfile[] {
-  return config.profiles ?? [];
+export function cachedBufferChannels(config: StoredConfig): BufferChannel[] {
+  return config.channels ?? [];
 }
 
-/** Publish text now to one channel. Returns Buffer's update id. */
+/**
+ * Publish text to one channel now. Returns Buffer's post id.
+ * `mode` maps onto Buffer's sharing modes; the default publishes immediately
+ * rather than dropping the post into the channel's queue.
+ */
 export async function publishToBuffer(
   organizationId: string,
-  profileId: string,
-  text: string
+  channelId: string,
+  text: string,
+  mode: "shareNow" | "addToQueue" | "shareNext" = "shareNow"
 ): Promise<string> {
-  const json = await bufferApi<{ updates?: Array<{ id?: string }> }>(
-    organizationId,
-    "/updates/create.json",
-    {
-      method: "POST",
-      body: JSON.stringify({ profile_ids: [profileId], text, now: true }),
-    }
-  );
-  const id = json.updates?.[0]?.id;
+  const { rowId, config } = await readConfig(organizationId);
+  if (!config.accessToken) throw new Error("Buffer is not connected.");
+  const accessToken = await refreshIfNeeded(organizationId, rowId, config);
+
+  const data = await bufferGraphQl<{
+    createPost: { post?: { id?: string }; message?: string };
+  }>(accessToken, CREATE_POST_MUTATION, {
+    input: {
+      text,
+      channelId,
+      schedulingType: "automatic",
+      mode,
+    },
+  });
+
+  // Buffer reports failures as a union member, not an HTTP status.
+  const failure = data.createPost?.message;
+  if (failure) throw new Error(`Buffer rejected the post: ${failure}`);
+  const id = data.createPost?.post?.id;
   if (!id) throw new Error("Buffer accepted the post but returned no id.");
   return id;
 }
 
 export async function disconnectBuffer(organizationId: string): Promise<void> {
   const { rowId, config } = await readConfig(organizationId);
-  const { accessToken: _a, refreshToken: _r, expiresAt: _e, profiles: _p, ...rest } = config;
+  const {
+    accessToken: _a,
+    refreshToken: _r,
+    expiresAt: _e,
+    channels: _c,
+    bufferOrganizationId: _o,
+    bufferOrganizationName: _n,
+    ...rest
+  } = config;
   void _a;
   void _r;
   void _e;
-  void _p;
+  void _c;
+  void _o;
+  void _n;
   await writeConfig(organizationId, rowId, rest, "not_connected");
 }
 
 export async function getBufferStatus(organizationId: string): Promise<{
   connected: boolean;
-  profiles: BufferProfile[];
+  channels: BufferChannel[];
   envConfigured: boolean;
+  organizationName: string | null;
 }> {
   const { config } = await readConfig(organizationId);
   return {
     connected: Boolean(config.accessToken),
-    profiles: cachedBufferProfiles(config),
+    channels: cachedBufferChannels(config),
     envConfigured: bufferEnv() !== null,
+    organizationName: config.bufferOrganizationName ?? null,
   };
 }

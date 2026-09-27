@@ -1,17 +1,21 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { AppBreadcrumbs } from "@/components/app-breadcrumbs";
 import { CustomSidebarTrigger } from "@/components/custom-sidebar-trigger";
 import { navLinks } from "@/components/app-shared";
 import { NavUser } from "@/components/nav-user";
-import { SendIcon, BellIcon } from "lucide-react";
-
-const activeItem = navLinks.find((item) => item.isActive);
 
 export function AppHeader({ userEmail }: { userEmail?: string }) {
+	const pathname = usePathname();
+	const activeItem = navLinks.find((item) => {
+		if (!item.path || item.path.startsWith("#")) return false;
+		if (item.path === "/dashboard") return pathname === "/dashboard";
+		return pathname === item.path || pathname.startsWith(`${item.path}/`);
+	});
+
 	return (
 		<header
 			className={cn(
@@ -27,18 +31,6 @@ export function AppHeader({ userEmail }: { userEmail?: string }) {
 				<AppBreadcrumbs page={activeItem} />
 			</div>
 			<div className="flex items-center gap-3">
-				<Button size="icon" variant="outline">
-					<SendIcon
-					/>
-				</Button>
-				<Button aria-label="Notifications" size="icon" variant="outline">
-					<BellIcon
-					/>
-				</Button>
-				<Separator
-					className="h-4 data-[orientation=vertical]:self-center"
-					orientation="vertical"
-				/>
 				<NavUser email={userEmail} />
 			</div>
 		</header>

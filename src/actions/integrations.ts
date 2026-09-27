@@ -5,24 +5,24 @@ import { createClient } from "@/lib/supabase/server";
 import { requireOrganizationId } from "@/lib/supabase/organization";
 import {
   disconnectBuffer,
-  getBufferProfiles,
+  getBufferChannels,
   publishToBuffer,
-  type BufferProfile,
+  type BufferChannel,
 } from "@/lib/integrations/buffer";
 
-export type { BufferProfile };
+export type { BufferChannel };
 
 export interface IntegrationResult {
   ok: boolean;
   error?: string;
-  channels?: BufferProfile[];
+  channels?: BufferChannel[];
   publicationId?: string;
 }
 
 export async function refreshBufferChannels(): Promise<IntegrationResult> {
   try {
     const organizationId = await requireOrganizationId();
-    const channels = await getBufferProfiles(organizationId);
+    const channels = await getBufferChannels(organizationId);
     revalidatePath("/settings/ai");
     return { ok: true, channels };
   } catch (err) {
@@ -48,7 +48,7 @@ export async function disconnectBufferAction(): Promise<IntegrationResult> {
  */
 export async function publishAssetViaBuffer(
   assetId: string,
-  profileId: string
+  channelId: string
 ): Promise<IntegrationResult> {
   try {
     const organizationId = await requireOrganizationId();
@@ -70,7 +70,7 @@ export async function publishAssetViaBuffer(
     if (!text) return { ok: false, error: "Asset has no text to publish." };
 
     try {
-      const externalId = await publishToBuffer(organizationId, profileId, text);
+      const externalId = await publishToBuffer(organizationId, channelId, text);
       const { data: pub } = await supabase
         .from("publications")
         .insert({

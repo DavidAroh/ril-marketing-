@@ -6,11 +6,13 @@ import { scoreLead } from "@/lib/leads/scoring";
 
 const captureSchema = z.object({
   token: z.string().trim().max(64).optional().default(""),
+  page: z.string().trim().max(100).optional().default(""),
   email: z.string().trim().email("A valid email is required.").max(320),
   name: z.string().trim().max(200).optional().default(""),
   phone: z.string().trim().max(40).optional().default(""),
   organisation: z.string().trim().max(200).optional().default(""),
   interest: z.string().trim().max(500).optional().default(""),
+  marketingConsent: z.boolean().optional().default(false),
 });
 
 // Best-effort per-instance throttle for the public endpoint. Production
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
     let assetId: string | null = null;
     let segmentId: string | null = null;
     let platform: string | null = null;
+    let campaignId: string | null = null;
+    let landingPageId: string | null = null;
 
     if (d.token && isRegistrationToken(d.token)) {
       const { data: link } = await admin
@@ -81,8 +85,30 @@ export async function POST(request: Request) {
       if (link?.content_assets) {
         organizationId = link.organization_id;
         assetId = link.content_assets.id;
+        campaignId = link.content_assets.campaign_id;
         segmentId = link.content_assets.audience_segment_id;
         platform = link.content_assets.platform ?? link.channel;
+      }
+    }
+
+    if (!organizationId && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(d.page)) {
+      const { data: page } = await admin
+        .from("landing_pages")
+        .select("id, organization_id, campaign_id, audience_segment_id")
+        .eq("slug", d.page)
+        .eq("status", "published")
+        .maybeSingle<{
+          id: string;
+          organization_id: string;
+          campaign_id: string | null;
+          audience_segment_id: string | null;
+        }>();
+      if (page) {
+        organizationId = page.organization_id;
+        landingPageId = page.id;
+        campaignId = page.campaign_id;
+        segmentId = page.audience_segment_id;
+        platform = "landing_page";
       }
     }
 
@@ -102,6 +128,12 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle<{ id: string }>();
     if (existing) {
+      if (d.marketingConsent) {
+        await admin.from("leads")
+          .update({ marketing_consent: true, marketing_consent_at: new Date().toISOString() })
+          .eq("organization_id", organizationId)
+          .eq("id", existing.id);
+      }
       return NextResponse.json({ ok: true, leadId: existing.id, duplicate: true });
     }
 
@@ -125,7 +157,11 @@ export async function POST(request: Request) {
         audience_segment_id: segmentId,
         source_platform: platform,
         source_content_asset_id: assetId,
+        campaign_id: campaignId,
+        landing_page_id: landingPageId,
         registration_token: d.token || null,
+        marketing_consent: d.marketingConsent,
+        marketing_consent_at: d.marketingConsent ? new Date().toISOString() : null,
         score,
         score_reason: reason,
       })

@@ -13,7 +13,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserIcon, BellIcon, CommandIcon, LifeBuoyIcon, GraduationCapIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
+import { signOut } from "@/actions/auth";
+import { UserIcon, BellIcon, LogOutIcon } from "lucide-react";
 
 const fallbackUser = {
 	name: "Signed in",
@@ -65,37 +66,15 @@ export function NavUser({ email }: { email?: string }) {
 						/>
 						Notifications
 					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<CommandIcon
-						/>
-						Keyboard shortcuts
-					</DropdownMenuItem>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>
-						<LifeBuoyIcon
-						/>
-						Help center
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<GraduationCapIcon
-						/>
-						Agent training
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuItem>
-						<CreditCardIcon
-						/>
-						Subscription
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuGroup>						<DropdownMenuItem
-							className="w-full cursor-pointer text-destructive focus:text-destructive"
-						>
+					<DropdownMenuItem
+						className="w-full cursor-pointer text-destructive focus:text-destructive"
+						onSelect={() => {
+							void signOut();
+						}}
+					>
 						<LogOutIcon
 						/>
 						Log out

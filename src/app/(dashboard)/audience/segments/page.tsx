@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listSegments } from "@/lib/audience/segments";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
+import { Button } from "@/components/ui/button";
 import { todayDateline, wireLabel } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Audience Segments" };
@@ -17,17 +19,22 @@ export default async function SegmentsPage() {
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">
-      <div>
-        <p className="dateline">
-          {todayDateline()} · {segments.length} segments
-        </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
-          Audience Segments
-        </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          Who RIL is marketing to — needs, motivations, and preferred formats
-          that ground every recommendation.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="dateline">
+            {todayDateline()} · {segments.length} segments
+          </p>
+          <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+            Audience Segments
+          </h1>
+          <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
+            Who RIL is marketing to — needs, motivations, and preferred formats
+            that ground every recommendation.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/audience/segments/new">New segment</Link>
+        </Button>
       </div>
 
       {segments.length === 0 ? (
@@ -38,7 +45,11 @@ export default async function SegmentsPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {segments.map((s, i) => (
-            <article key={s.id} className="slip flex flex-col gap-3 px-5 py-4 sm:px-6">
+            <Link
+              key={s.id}
+              href={`/audience/segments/${s.id}`}
+              className="slip flex flex-col gap-3 px-5 py-4 transition-colors hover:border-primary/40 sm:px-6"
+            >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="dateline">{wireLabel(i)}</span>
                 {s.pending_insights_count > 0 ? (
@@ -78,7 +89,7 @@ export default async function SegmentsPage() {
                   Programs: {s.programs.map((p) => p.name).join(", ")}
                 </p>
               ) : null}
-            </article>
+            </Link>
           ))}
         </div>
       )}

@@ -1,0 +1,287 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "RIL home" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Renaissance Innovation Labs" [ref=e7]
+        - navigation "Primary" [ref=e8]:
+          - link "Platform" [ref=e9] [cursor=pointer]:
+            - /url: "#platform"
+          - link "Workflow" [ref=e10] [cursor=pointer]:
+            - /url: "#workflow"
+          - link "Learning" [ref=e11] [cursor=pointer]:
+            - /url: "#learning"
+          - link "FAQ" [ref=e12] [cursor=pointer]:
+            - /url: "#faq"
+        - generic [ref=e13]:
+          - link "Sign in" [ref=e14] [cursor=pointer]:
+            - /url: /sign-in
+          - link "Get started" [ref=e15] [cursor=pointer]:
+            - /url: /sign-up
+    - main [ref=e16]:
+      - region [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - heading "One event in. A whole campaign out." [level=1] [ref=e21]:
+              - text: One event in.
+              - generic [ref=e22]: A whole campaign out.
+            - paragraph [ref=e24]: RIL's marketing operating system turns what's happening across our programs into on-brand content, scheduled posts, emails, and leads — with a human approving everything that matters.
+            - generic [ref=e26]:
+              - link "Get started" [ref=e27] [cursor=pointer]:
+                - /url: /sign-up
+              - link "See how it works" [ref=e30] [cursor=pointer]:
+                - /url: "#workflow"
+            - list [ref=e32]:
+              - listitem [ref=e33]: Approval gate on everything
+              - listitem [ref=e35]: Your data stays isolated
+              - listitem [ref=e37]: Works with or without an AI key
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - article "Synthetic approval queue preview" [ref=e41]:
+                - generic [ref=e42]:
+                  - paragraph [ref=e43]: Review queue
+                  - generic [ref=e44]: Synthetic demo
+                - list [ref=e46]:
+                  - listitem [ref=e47]:
+                    - paragraph [ref=e48]: Bootcamp finale draws first-time founders
+                    - paragraph [ref=e49]: Spotted across 2 segments · Waiting for your call
+                    - generic [ref=e50]: Pending review
+                  - listitem [ref=e53]:
+                    - paragraph [ref=e54]: Alumni stories convert on registration links
+                    - paragraph [ref=e55]: Approved and cleared for repurposing
+                    - generic [ref=e56]: Approved
+                  - listitem [ref=e59]:
+                    - paragraph [ref=e60]: Hype spike with no retention behind it
+                    - paragraph [ref=e61]: Suppressed · Never recommended
+                    - generic [ref=e62]: Suppressed
+              - complementary [ref=e65]:
+                - generic [ref=e66]:
+                  - paragraph [ref=e67]: The whole loop
+                  - paragraph [ref=e68]: Log it once.Use it everywhere.
+                  - paragraph [ref=e69]: One activity becomes blogs, newsletters, clips, posts, emails, landing pages — and the leads they bring back.
+                - link "See the platform" [ref=e70] [cursor=pointer]:
+                  - /url: "#platform"
+            - paragraph [ref=e71]: Synthetic demo trays. Your activities, queue, and counts appear here live after sign in.
+      - region "The promise" [ref=e72]:
+        - paragraph [ref=e74]:
+          - generic [ref=e75]: One
+          - generic [ref=e76]: busy
+          - generic [ref=e77]: week
+          - generic [ref=e78]: becomes
+          - generic [ref=e79]: a
+          - generic [ref=e80]: month
+          - generic [ref=e81]: of
+          - generic [ref=e82]: content.
+          - generic [ref=e83]: AI
+          - generic [ref=e84]: drafts
+          - generic [ref=e85]: it.
+          - generic [ref=e86]: Humans
+          - generic [ref=e87]: decide
+          - generic [ref=e88]: it.
+          - generic [ref=e89]: And
+          - generic [ref=e90]: every
+          - generic [ref=e91]: signup
+          - generic [ref=e92]: traces
+          - generic [ref=e93]: back
+          - generic [ref=e94]: to
+          - generic [ref=e95]: the
+          - generic [ref=e96]: asset
+          - generic [ref=e97]: that
+          - generic [ref=e98]: earned
+          - text: it.
+      - region [ref=e99]:
+        - generic [ref=e100]:
+          - heading "From one activity to a whole campaign." [level=2] [ref=e102]
+          - paragraph [ref=e104]: Six steps, run every week. Nothing publishes until a person says so — that part never changes.
+          - list [ref=e105]:
+            - listitem [ref=e106]:
+              - text: "01"
+              - heading "Log the activity" [level=3] [ref=e107]
+              - paragraph [ref=e108]: Programs and partnerships log what's happening — once.
+            - listitem [ref=e109]:
+              - text: "02"
+              - heading "AI understands it" [level=3] [ref=e110]
+              - paragraph [ref=e111]: Topics, quotes, angles, and audiences, surfaced automatically.
+            - listitem [ref=e112]:
+              - text: "03"
+              - heading "Repurpose everything" [level=3] [ref=e113]
+              - paragraph [ref=e114]: Blogs, newsletters, clips, captions, and posts from one source.
+            - listitem [ref=e115]:
+              - text: "04"
+              - heading "You approve" [level=3] [ref=e116]
+              - paragraph [ref=e117]: Edit, approve, or suppress. Nothing moves without a stamp.
+            - listitem [ref=e118]:
+              - text: "05"
+              - heading "Publish and capture" [level=3] [ref=e119]
+              - paragraph [ref=e120]: Scheduled posts, emails, pages — every signup traced to its asset.
+            - listitem [ref=e121]:
+              - text: "06"
+              - heading "Learn and repeat" [level=3] [ref=e122]
+              - paragraph [ref=e123]: Performance becomes the next round of recommendations.
+      - region [ref=e124]:
+        - heading "Ten modules. One source of truth." [level=2] [ref=e126]
+        - paragraph [ref=e128]: Every module reads from the same logged activities, so nothing drifts and nobody re-enters data twice.
+        - generic [ref=e129]:
+          - generic [ref=e131]:
+            - heading "Command Centre" [level=3] [ref=e138]
+            - paragraph [ref=e139]: One live view of campaigns, approvals, leads, and tasks. The answer to “what's happening?”
+          - generic [ref=e141]:
+            - heading "Activity Hub" [level=3] [ref=e145]
+            - paragraph [ref=e146]: Every program, event, and partnership logged once — the source everything else builds on.
+          - generic [ref=e148]:
+            - heading "Repurposing Engine" [level=3] [ref=e155]
+            - paragraph [ref=e156]: Video, audio, images, and docs become blogs, newsletters, shorts, and social drafts.
+          - generic [ref=e158]:
+            - heading "Social & Publishing" [level=3] [ref=e163]
+            - paragraph [ref=e164]: Platform-adapted posts, approved once, published everywhere through Buffer.
+          - generic [ref=e166]:
+            - heading "Content Calendar" [level=3] [ref=e170]
+            - paragraph [ref=e171]: Every draft, approval, and scheduled post in one view — plus an AI that proposes the plan.
+          - generic [ref=e173]:
+            - heading "Email Marketing" [level=3] [ref=e178]
+            - paragraph [ref=e179]: Newsletters, campaigns, and nurture sequences built from approved content.
+          - generic [ref=e181]:
+            - heading "Leads & CRM" [level=3] [ref=e188]
+            - paragraph [ref=e189]: Capture, score, and follow up every lead in one record, stage by stage.
+          - generic [ref=e191]:
+            - heading "Registration Links" [level=3] [ref=e196]
+            - paragraph [ref=e197]: A unique tracked link per asset — know exactly what drove each signup.
+          - generic [ref=e199]:
+            - heading "Trends to Content" [level=3] [ref=e204]
+            - paragraph [ref=e205]: Industry signals turned into timely drafts. Unverified claims never ship as fact.
+          - generic [ref=e207]:
+            - heading "Analytics & Reports" [level=3] [ref=e211]
+            - paragraph [ref=e212]: Real counts plus AI-written narratives of what worked, what didn't, and what's next.
+          - link [ref=e214] [cursor=pointer]:
+            - /url: /sign-up
+            - paragraph [ref=e215]: And every one of them passes the approval gate first.
+            - generic [ref=e216]: Start your workspace
+      - region [ref=e219]:
+        - generic [ref=e220]:
+          - heading "AI drafts. Humans decide." [level=2] [ref=e222]
+          - paragraph [ref=e224]: The engine does the heavy lifting; the judgement stays with the team. Nothing public moves without a person's stamp on it.
+          - generic [ref=e225]:
+            - generic [ref=e227]:
+              - heading "AI handles the repetitive" [level=3] [ref=e228]
+              - list [ref=e229]:
+                - listitem [ref=e230]: Generate, summarise, and repurpose
+                - listitem [ref=e232]: Recommend, analyse, and classify
+                - listitem [ref=e234]: Suggest, draft, and detect
+                - listitem [ref=e236]: Score leads and flag trends
+            - generic [ref=e239]:
+              - heading "Humans approve the important" [level=3] [ref=e240]
+              - list [ref=e241]:
+                - listitem [ref=e242]:
+                  - generic [ref=e244]: Major public announcements
+                - listitem [ref=e245]:
+                  - generic [ref=e247]: Partnership communications
+                - listitem [ref=e248]:
+                  - generic [ref=e250]: Sensitive or crisis responses
+                - listitem [ref=e251]:
+                  - generic [ref=e253]: Paid advertising budgets
+                - listitem [ref=e254]:
+                  - generic [ref=e256]: Important emails and strategy
+      - region [ref=e257]:
+        - generic [ref=e258]:
+          - generic [ref=e259]:
+            - heading "Every campaign teaches the next one." [level=2] [ref=e261]
+            - paragraph [ref=e263]: Engagement, registration, and conversion data flow back into recommendations — so the system suggests what to say, to whom, where, and why, before the next campaign starts.
+          - generic [ref=e264]:
+            - paragraph [ref=e266]: Audience data → Behaviour analysis → Insight → Recommendation → Distribution → Engagement → Conversion → New learning
+            - list [ref=e267]:
+              - listitem [ref=e268]:
+                - paragraph [ref=e269]: Which topics move each audience segment
+              - listitem [ref=e271]:
+                - paragraph [ref=e272]: Which formats drive registrations, not just impressions
+              - listitem [ref=e274]:
+                - paragraph [ref=e275]: Which channels bring the highest-quality leads
+              - listitem [ref=e277]:
+                - paragraph [ref=e278]: Which hooks and CTAs actually get action
+      - region [ref=e280]:
+        - generic [ref=e281]:
+          - heading "Asked before you ask." [level=2] [ref=e283]
+          - generic [ref=e285]:
+            - group [ref=e287]:
+              - generic "Does the AI publish anything on its own?" [ref=e288] [cursor=pointer]:
+                - text: Does the AI publish anything on its own?
+                - generic [aria-hidden] [ref=e289]: +
+            - group [ref=e291]:
+              - generic "Which channels can we publish to?" [ref=e292] [cursor=pointer]:
+                - text: Which channels can we publish to?
+                - generic [aria-hidden] [ref=e293]: +
+            - group [ref=e295]:
+              - generic "Do we need our own AI key?" [ref=e296] [cursor=pointer]:
+                - text: Do we need our own AI key?
+                - generic [aria-hidden] [ref=e297]: +
+            - group [ref=e299]:
+              - generic "Is our data used to train AI models?" [ref=e300] [cursor=pointer]:
+                - text: Is our data used to train AI models?
+                - generic [aria-hidden] [ref=e301]: +
+            - group [ref=e303]:
+              - generic "Who sees our workspace data?" [ref=e304] [cursor=pointer]:
+                - text: Who sees our workspace data?
+                - generic [aria-hidden] [ref=e305]: +
+            - group [ref=e307]:
+              - generic "What happens to content we reject?" [ref=e308] [cursor=pointer]:
+                - text: What happens to content we reject?
+                - generic [aria-hidden] [ref=e309]: +
+      - region [ref=e310]:
+        - generic [ref=e311]:
+          - heading "Make the next event the campaign." [level=2] [ref=e313]
+          - paragraph [ref=e315]: Log what happened this week. Walk into Monday with drafts waiting, links tracked, and nothing published without your say.
+          - generic [ref=e317]:
+            - link "Get started" [ref=e318] [cursor=pointer]:
+              - /url: /sign-up
+            - link "Sign in" [ref=e321] [cursor=pointer]:
+              - /url: /sign-in
+    - contentinfo [ref=e322]:
+      - generic [ref=e323]:
+        - generic [ref=e324]:
+          - generic [ref=e325]:
+            - link "RIL home" [ref=e326] [cursor=pointer]:
+              - /url: /
+              - img "Renaissance Innovation Labs" [ref=e327]
+            - paragraph [ref=e328]: One event in. A whole campaign out.
+            - paragraph [ref=e329]: "Built in Port Harcourt, Nigeria, in the open lab spirit: collaboration, community, and trust."
+          - navigation "Footer" [ref=e330]:
+            - generic [ref=e331]:
+              - paragraph [ref=e332]: On this page
+              - link "Workflow" [ref=e333] [cursor=pointer]:
+                - /url: "#workflow"
+              - link "Platform" [ref=e334] [cursor=pointer]:
+                - /url: "#platform"
+              - link "Learning" [ref=e335] [cursor=pointer]:
+                - /url: "#learning"
+              - link "FAQ" [ref=e336] [cursor=pointer]:
+                - /url: "#faq"
+            - generic [ref=e337]:
+              - paragraph [ref=e338]: Elsewhere
+              - link "Sign in" [ref=e339] [cursor=pointer]:
+                - /url: /sign-in
+              - link "Get started" [ref=e340] [cursor=pointer]:
+                - /url: /sign-up
+              - link "renaissancelabs.org" [ref=e341] [cursor=pointer]:
+                - /url: https://www.renaissancelabs.org
+              - link "X (Twitter)" [ref=e342] [cursor=pointer]:
+                - /url: https://www.twitter.com/RxlabsHQ
+              - link "Instagram" [ref=e343] [cursor=pointer]:
+                - /url: https://www.instagram.com/RxlabsHQ
+        - generic [ref=e344]:
+          - paragraph [ref=e345]: © 2026 Renaissance Innovation Labs
+          - generic [ref=e346]:
+            - link "Privacy" [ref=e347] [cursor=pointer]:
+              - /url: https://www.renaissancelabs.org/privacy
+            - link "Terms" [ref=e348] [cursor=pointer]:
+              - /url: https://www.renaissancelabs.org/terms
+            - link "Back to top ↑" [ref=e349] [cursor=pointer]:
+              - /url: "#main"
+  - button "Open Next.js Dev Tools" [ref=e355] [cursor=pointer]:
+    - generic [ref=e358]:
+      - text: Compiling
+      - generic [ref=e359]:
+        - generic [ref=e360]: .
+        - generic [ref=e361]: .
+        - generic [ref=e362]: .

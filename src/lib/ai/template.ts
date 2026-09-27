@@ -42,7 +42,9 @@ function facts(ctx: GenerationContext): string {
 function audienceLine(ctx: GenerationContext): string {
   const bits: string[] = [];
   if (ctx.segmentName) bits.push(`Audience: ${ctx.segmentName}`);
+  if (ctx.audienceNeeds?.length) bits.push(`Needs: ${ctx.audienceNeeds.slice(0, 3).join(", ")}`);
   if (ctx.topics.length > 0) bits.push(`Proven topics: ${ctx.topics.slice(0, 3).join(", ")}`);
+  if (ctx.formats.length > 0) bits.push(`Formats: ${ctx.formats.slice(0, 3).join(", ")}`);
   if (ctx.platforms.length > 0) bits.push(`Priority platforms: ${ctx.platforms.slice(0, 3).join(", ")}`);
   return bits.join(" · ");
 }

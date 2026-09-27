@@ -24,6 +24,10 @@ export interface GenerationContext {
   partners: string[];
   eventDate: string | null;
   segmentName: string | null;
+  /** Explicit motivations from the selected audience segment. */
+  audienceNeeds?: string[];
+  /** Retrieved, approved RIL brand knowledge relevant to this source. */
+  brandGuidance?: string[];
   /** Proven topics/formats/platforms/hooks/CTAs from APPROVED insights. */
   topics: string[];
   formats: string[];

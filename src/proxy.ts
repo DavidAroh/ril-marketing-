@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/api/")) return response;
 
-  const isPublic = pathname === "/" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  const isPublic = pathname === "/" || pathname.startsWith("/p/") || pathname === "/sitemap.xml" || pathname === "/robots.txt" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
   if (!user && !isPublic) {
     const signIn = request.nextUrl.clone();
     signIn.pathname = "/sign-in";

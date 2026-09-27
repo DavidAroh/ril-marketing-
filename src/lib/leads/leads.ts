@@ -18,6 +18,10 @@ export interface LeadRow {
   source_platform: string | null;
   source_content_asset_id: string | null;
   registration_token: string | null;
+  campaign_id: string | null;
+  landing_page_id: string | null;
+  marketing_consent: boolean;
+  marketing_consent_at: string | null;
   is_qualified: boolean;
   is_converted: boolean;
   created_at: string;

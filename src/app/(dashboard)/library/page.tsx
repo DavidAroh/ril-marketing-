@@ -7,6 +7,7 @@ import { ASSET_STATUSES } from "@/lib/content/transitions";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
 import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Content Library" };
 
@@ -15,15 +16,30 @@ const VALID_STATUSES = new Set<string>(["all", ...ASSET_STATUSES]);
 export default async function LibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; page?: string; q?: string; channel?: string; activity?: string; campaign?: string }>;
 }) {
   const sp = await searchParams;
   const status = sp.status && VALID_STATUSES.has(sp.status) ? sp.status : "all";
   const page = Math.max(1, Number(sp.page) || 1);
+  const q = sp.q?.trim() ?? "";
+  const channel = sp.channel ?? "all";
+  const activity = sp.activity ?? "all";
+  const campaign = sp.campaign ?? "all";
 
   const orgId = await getCallerOrganizationId().catch(() => null);
+  const supabase = orgId ? await createClient() : null;
+  const [activityResult, campaignResult, channelResult] = supabase
+    ? await Promise.all([
+        supabase.from("activities").select("id,title").eq("organization_id", orgId).order("event_date", { ascending: false }).limit(200),
+        supabase.from("campaigns").select("id,name").eq("organization_id", orgId).order("created_at", { ascending: false }).limit(200),
+        supabase.from("content_assets").select("channel").eq("organization_id", orgId).not("channel", "is", null).limit(500),
+      ])
+    : [{ data: [] }, { data: [] }, { data: [] }];
+  const activityOptions = (activityResult.data ?? []) as Array<{ id: string; title: string }>;
+  const campaignOptions = (campaignResult.data ?? []) as Array<{ id: string; name: string }>;
+  const channelOptions = [...new Set((channelResult.data ?? []).map((row) => row.channel).filter((v): v is string => Boolean(v)))].sort();
   const result = orgId
-    ? await listAssets(orgId, { status, page }).catch(() => ({ assets: [], total: 0 }))
+    ? await listAssets(orgId, { status, page, q, channel, activityId: activity, campaignId: campaign }).catch(() => ({ assets: [], total: 0 }))
     : { assets: [], total: 0 };
 
   const totalPages = Math.max(1, Math.ceil(result.total / 20));
@@ -32,7 +48,21 @@ export default async function LibraryPage({
   const pageHref = (p: number) => {
     const params = new URLSearchParams();
     if (status !== "all") params.set("status", status);
+    if (q) params.set("q", q);
+    if (channel !== "all") params.set("channel", channel);
+    if (activity !== "all") params.set("activity", activity);
+    if (campaign !== "all") params.set("campaign", campaign);
     if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return `/library${qs ? `?${qs}` : ""}`;
+  };
+  const filterHref = (nextStatus: string) => {
+    const params = new URLSearchParams();
+    if (nextStatus !== "all") params.set("status", nextStatus);
+    if (q) params.set("q", q);
+    if (channel !== "all") params.set("channel", channel);
+    if (activity !== "all") params.set("activity", activity);
+    if (campaign !== "all") params.set("campaign", campaign);
     const qs = params.toString();
     return `/library${qs ? `?${qs}` : ""}`;
   };
@@ -53,11 +83,20 @@ export default async function LibraryPage({
         </p>
       </div>
 
+      <form method="get" action="/library" className="slip grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
+        {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
+        <label className="flex flex-col gap-1.5 lg:col-span-2"><span className="dateline">Search copy</span><input name="q" defaultValue={q} maxLength={200} placeholder="Title or draft text" className="h-10 rounded-md border border-input bg-background px-3 text-sm" /></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Channel</span><select name="channel" defaultValue={channel} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All channels</option>{channelOptions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Source activity</span><select name="activity" defaultValue={activity} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All activities</option>{activityOptions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Campaign</span><select name="campaign" defaultValue={campaign} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All campaigns</option>{campaignOptions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+        <div className="flex items-center justify-end gap-3 sm:col-span-2 lg:col-span-5"><Link href="/library" className="text-sm text-muted-foreground hover:text-foreground">Clear filters</Link><button type="submit" className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">Apply filters</button></div>
+      </form>
+
       <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
         {filters.map((f) => (
           <Link
             key={f}
-            href={f === "all" ? "/library" : `/library?status=${f}`}
+            href={filterHref(f)}
             aria-current={status === f ? "page" : undefined}
             className={cn(
               "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.06em] transition-colors",
@@ -83,11 +122,20 @@ export default async function LibraryPage({
       ) : (
         <ul className="ledger slip divide-y divide-border overflow-hidden">
           {result.assets.map((a, i) => (
-            <li key={a.id} className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
+            <li key={a.id}>
+              <Link
+                href={`/library/${a.id}`}
+                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+              >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="dateline">{wireLabel(i)}</span>
                   <StatusStamp status={a.status} />
+                  {a.metadata?.calendar_generator === true ? (
+                    <span className="rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      Calendar proposal
+                    </span>
+                  ) : null}
                   {a.sensitivity === "high" ? (
                     <span className="rounded-md border border-destructive bg-destructive/5 px-1.5 py-0.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-destructive">
                       High sensitivity
@@ -103,8 +151,11 @@ export default async function LibraryPage({
                 </p>
               </div>
               <span className="dateline shrink-0 tabular-nums">
-                {formatDay(a.scheduled_for ?? a.published_at ?? a.created_at)}
+                {a.metadata?.calendar_generator === true && typeof a.metadata.suggested_publish_at === "string"
+                  ? `Suggested ${formatDay(a.metadata.suggested_publish_at)}`
+                  : formatDay(a.scheduled_for ?? a.published_at ?? a.created_at)}
               </span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -113,7 +164,7 @@ export default async function LibraryPage({
       {totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="font-medium text-primary">
+            <Link href={pageHref(page - 1)} className="inline-block py-1 font-medium text-primary">
               ← Previous
             </Link>
           ) : (
@@ -123,7 +174,7 @@ export default async function LibraryPage({
             Page {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link href={pageHref(page + 1)} className="font-medium text-primary">
+            <Link href={pageHref(page + 1)} className="inline-block py-1 font-medium text-primary">
               Next →
             </Link>
           ) : (

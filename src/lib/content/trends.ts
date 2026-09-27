@@ -11,6 +11,10 @@ export interface Trend {
   angle: string | null;
   audience: string | null;
   risk: string | null;
+  source_item_id: string | null;
+  source_published_at: string | null;
+  summary: string | null;
+  analysis_status: "manual" | "analysed" | "unanalysed" | "failed";
   status: "new" | "approved" | "dismissed";
   created_at: string;
 }

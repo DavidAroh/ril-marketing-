@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { generateAudienceInsights } from "@/jobs/audience-insights/generate";
 
 /**
- * Protected cron trigger (§12): POST /api/cron/audience-insights
+ * Protected cron trigger (§12): GET/POST /api/cron/audience-insights
  * Auth: `Authorization: Bearer <CRON_SECRET>`. Never expose unauthenticated.
  * On Vercel, schedule via vercel.json crons.
  */
@@ -38,9 +38,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json(
-    { error: "Use POST with a Bearer CRON_SECRET." },
-    { status: 405 }
-  );
-}
+// Vercel Cron invokes scheduled routes with GET and includes the configured
+// CRON_SECRET as a Bearer token. Keep the same auth gate for both methods.
+export async function GET(request: Request) { return POST(request); }

@@ -73,7 +73,7 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/sign-up"
-              className="hidden h-9 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors duration-200 hover:bg-[hsl(var(--ril-blue-deep))] sm:inline-flex"
+              className="hidden h-9 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors duration-200 hover:bg-[var(--ril-blue-deep)] sm:inline-flex"
             >
               Get started
             </Link>

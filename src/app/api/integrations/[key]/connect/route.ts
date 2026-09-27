@@ -36,7 +36,7 @@ export async function GET(
     if (!env) {
       settings.searchParams.set(
         "connect_error",
-        "Buffer needs server setup first (BUFFER_CLIENT_ID / BUFFER_CLIENT_SECRET)."
+        "Social publishing isn't switched on for this workspace yet. Ask a workspace owner to register the Buffer app (BUFFER_CLIENT_ID)."
       );
       return NextResponse.redirect(settings);
     }
@@ -44,10 +44,10 @@ export async function GET(
     if (!organizationId) {
       return NextResponse.json({ error: "No organization membership." }, { status: 403 });
     }
-    const state = await stageBufferHandshake(organizationId);
+    const { state, codeChallenge } = await stageBufferHandshake(organizationId);
     const redirectUri = new URL(`/api/integrations/${key}/callback`, request.url).toString();
     return NextResponse.redirect(
-      buildAuthorizeUrl(def, { clientId: env.clientId, redirectUri, state })
+      buildAuthorizeUrl(def, { clientId: env.clientId, redirectUri, state, codeChallenge })
     );
   } catch (err) {
     settings.searchParams.set(

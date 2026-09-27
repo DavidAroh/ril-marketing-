@@ -188,6 +188,12 @@ export interface Campaign {
   status: CampaignStatus;
   starts_on: string | null;
   ends_on: string | null;
+  objective: string;
+  target_audience: string;
+  funnel_stage: "awareness" | "engagement" | "lead_capture" | "nurturing" | "conversion" | "retention";
+  budget: number | null;
+  budget_currency: "NGN" | "USD" | "GBP" | "EUR";
+  channels: string[];
   created_at: string;
 }
 

@@ -1,0 +1,31 @@
+
+> ril-audience-intelligence@1.0.0 dev
+> next dev
+
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.9:3000
+- Environments: .env
+✓ Ready in 971ms
+✓ Running next.config.ts took 122ms
+
+ GET / 200 in 1417ms (next.js: 303ms, proxy.ts: 356ms, application-code: 758ms)
+ GET / 200 in 570ms (next.js: 21ms, proxy.ts: 26ms, application-code: 524ms)
+ GET /dashboard 200 in 3.5s (next.js: 71ms, proxy.ts: 1575ms, application-code: 1903ms)
+ POST /api/track/view 200 in 1549ms (next.js: 174ms, proxy.ts: 862ms, application-code: 514ms)
+ GET / 200 in 610ms (next.js: 8ms, proxy.ts: 12ms, application-code: 590ms)
+ POST /api/track/view 200 in 35ms (next.js: 7ms, proxy.ts: 12ms, application-code: 17ms)
+ GET /sign-in 200 in 641ms (next.js: 104ms, proxy.ts: 13ms, application-code: 524ms)
+ POST /api/track/view 200 in 106ms (next.js: 26ms, proxy.ts: 47ms, application-code: 33ms)
+ GET / 200 in 499ms (next.js: 8ms, proxy.ts: 16ms, application-code: 475ms)
+ POST /api/track/view 200 in 38ms (next.js: 9ms, proxy.ts: 18ms, application-code: 11ms)
+ GET / 200 in 4.5s (next.js: 48ms, proxy.ts: 15ms, application-code: 4.4s)
+ GET / 200 in 4.4s (next.js: 52ms, proxy.ts: 825ms, application-code: 3.5s)
+ GET / 200 in 3.6s (next.js: 640ms, proxy.ts: 65ms, application-code: 2.9s)
+ GET /sign-in 200 in 169ms (next.js: 20ms, proxy.ts: 10ms, application-code: 139ms)
+ POST /api/track/view 200 in 65ms (next.js: 24ms, proxy.ts: 25ms, application-code: 16ms)
+ GET / 200 in 471ms (next.js: 23ms, proxy.ts: 14ms, application-code: 433ms)
+ POST /api/track/view 200 in 35ms (next.js: 7ms, proxy.ts: 18ms, application-code: 10ms)
+ GET / 200 in 1279ms (next.js: 21ms, proxy.ts: 35ms, application-code: 1222ms)
+ POST /api/track/view 200 in 396ms (next.js: 33ms, proxy.ts: 334ms, application-code: 29ms)
+[?25h

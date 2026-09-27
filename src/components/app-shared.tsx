@@ -1,5 +1,24 @@
 import type { ReactNode } from "react";
-import { LayoutGridIcon, ListChecksIcon, BarChart3Icon, MessageSquareTextIcon, UsersIcon, PlugIcon, SettingsIcon, HelpCircleIcon, ActivityIcon } from "lucide-react";
+import {
+	LayoutDashboardIcon,
+	NotebookPenIcon,
+	LibraryIcon,
+	CalendarIcon,
+	UsersIcon,
+	LightbulbIcon,
+	MegaphoneIcon,
+	TrendingUpIcon,
+	UserPlusIcon,
+	MailIcon,
+	FileChartColumnIncreasingIcon,
+	MessageCircleMoreIcon,
+	WorkflowIcon,
+	SettingsIcon,
+	BookOpenIcon,
+	BotIcon,
+	PanelsTopLeftIcon,
+	FileSearchIcon,
+} from "lucide-react";
 
 export type SidebarNavItem = {
 	title: string;
@@ -14,113 +33,61 @@ export type SidebarNavGroup = {
 	items: SidebarNavItem[];
 };
 
+/**
+ * RIL Audience Intelligence — the real product navigation.
+ * Every item points at a live route; groups follow the operating ritual
+ * (capture → intelligence → growth → setup). No dead anchors.
+ */
 export const navGroups: SidebarNavGroup[] = [
 	{
 		items: [
 			{
-				title: "Overview",
-				path: "#/overview",
-				icon: (
-					<LayoutGridIcon
-					/>
-				),
-				isActive: true,
+				title: "Command Centre",
+				path: "/dashboard",
+				icon: <LayoutDashboardIcon />,
 			},
 		],
 	},
 	{
-		label: "Today",
+		label: "Essentials",
 		items: [
-			{
-				title: "Queue",
-				path: "#/queue",
-				icon: (
-					<ListChecksIcon
-					/>
-				),
-			},
-			{
-				title: "Team insights",
-				path: "#/team-insights",
-				icon: (
-					<BarChart3Icon
-					/>
-				),
-			},
+			{ title: "Activities", path: "/activities", icon: <NotebookPenIcon /> },
+			{ title: "Content Library", path: "/library", icon: <LibraryIcon /> },
+			{ title: "SEO Workspace", path: "/seo", icon: <FileSearchIcon /> },
+			{ title: "Calendar", path: "/calendar", icon: <CalendarIcon /> },
 		],
 	},
 	{
-		label: "Inbox",
+		label: "Intelligence",
 		items: [
-			{
-				title: "Conversations",
-				icon: (
-					<MessageSquareTextIcon
-					/>
-				),
-				subItems: [
-					{ title: "Unassigned", path: "#/inbox/unassigned" },
-					{ title: "Assigned to me", path: "#/inbox/assigned" },
-					{ title: "Recently closed", path: "#/inbox/closed" },
-				],
-			},
-			{
-				title: "Customers",
-				path: "#/customers",
-				icon: (
-					<UsersIcon
-					/>
-				),
-			},
-			{
-				title: "Channels",
-				path: "#/channels",
-				icon: (
-					<PlugIcon
-					/>
-				),
-			},
+			{ title: "Segments", path: "/audience/segments", icon: <UsersIcon /> },
+			{ title: "Insights", path: "/audience/insights", icon: <LightbulbIcon /> },
+			{ title: "Campaigns", path: "/audience/campaigns", icon: <MegaphoneIcon /> },
+			{ title: "Assistant", path: "/assistant", icon: <BotIcon /> },
+			{ title: "Trends", path: "/trends", icon: <TrendingUpIcon /> },
 		],
 	},
 	{
-		label: "Organization",
+		label: "Growth",
 		items: [
-			{
-				title: "Workspace",
-				icon: (
-					<SettingsIcon
-					/>
-				),
-				subItems: [
-					{ title: "Branding", path: "#/workspace/branding" },
-					{ title: "Team & roles", path: "#/workspace/team" },
-					{ title: "API keys", path: "#/workspace/api-keys" },
-					{ title: "Webhooks", path: "#/workspace/webhooks" },
-					{ title: "Billing", path: "#/workspace/billing" },
-				],
-			},
+			{ title: "Leads", path: "/leads", icon: <UserPlusIcon /> },
+			{ title: "Email", path: "/email", icon: <MailIcon /> },
+			{ title: "Reports", path: "/reports", icon: <FileChartColumnIncreasingIcon /> },
+			{ title: "Community Inbox", path: "/community", icon: <MessageCircleMoreIcon /> },
+			{ title: "Landing Pages", path: "/audience/landing-pages", icon: <PanelsTopLeftIcon /> },
+		],
+	},
+	{
+		label: "Workspace",
+		items: [
+			{ title: "Automation", path: "/settings/automation", icon: <WorkflowIcon /> },
+			{ title: "Brand Knowledge", path: "/settings/brand", icon: <BookOpenIcon /> },
+			{ title: "AI & Integrations", path: "/settings/ai", icon: <SettingsIcon /> },
 		],
 	},
 ];
 
-export const footerNavLinks: SidebarNavItem[] = [
-	{
-		title: "Help Center",
-		path: "#/help",
-		icon: (
-			<HelpCircleIcon
-			/>
-		),
-	},
-	{
-		title: "System status",
-		path: "#/status",
-		icon: (
-			<ActivityIcon
-			/>
-		),
-	},
-];
+export const footerNavLinks: SidebarNavItem[] = [];
 
 export const navLinks: SidebarNavItem[] = [
 	...navGroups.flatMap((group) =>

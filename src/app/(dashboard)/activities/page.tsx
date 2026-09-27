@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listActivities } from "@/lib/content/activities";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { formatDay, todayDateline, wireLabel } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Activities" };
@@ -14,17 +16,22 @@ export default async function ActivitiesPage() {
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">
-      <div>
-        <p className="dateline">
-          {todayDateline()} · {activities.length} logged
-        </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
-          Activities
-        </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          Everything happening at RIL — the source record every asset, campaign,
-          and lead traces back to.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="dateline">
+            {todayDateline()} · {activities.length} logged
+          </p>
+          <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+            Activities
+          </h1>
+          <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
+            Everything happening at RIL — the source record every asset, campaign,
+            and lead traces back to.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/activities/new">Log activity</Link>
+        </Button>
       </div>
 
       {activities.length === 0 ? (
@@ -35,7 +42,11 @@ export default async function ActivitiesPage() {
       ) : (
         <ul className="ledger slip divide-y divide-border overflow-hidden">
           {activities.map((a, i) => (
-            <li key={a.id} className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
+            <li key={a.id}>
+              <Link
+                href={`/activities/${a.id}`}
+                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+              >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="dateline">{wireLabel(i)}</span>
@@ -62,6 +73,7 @@ export default async function ActivitiesPage() {
               <span className="dateline shrink-0 tabular-nums">
                 {formatDay(a.event_date ?? a.created_at)}
               </span>
+              </Link>
             </li>
           ))}
         </ul>

@@ -109,9 +109,12 @@ export default async function InsightsPage({
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium leading-6 text-foreground">
+                <Link
+                  href={`/audience/insights/${ins.id}`}
+                  className="text-sm font-medium leading-6 text-foreground transition-colors hover:text-primary"
+                >
                   {ins.summary}
-                </p>
+                </Link>
                 <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
                   {ins.recommendation}
                 </p>
@@ -136,7 +139,7 @@ export default async function InsightsPage({
       {result.totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {result.page > 1 ? (
-            <Link href={pageHref(result.page - 1)} className="font-medium text-primary">
+            <Link href={pageHref(result.page - 1)} className="inline-block py-1 font-medium text-primary">
               ← Previous
             </Link>
           ) : (
@@ -146,7 +149,7 @@ export default async function InsightsPage({
             Page {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={pageHref(result.page + 1)} className="font-medium text-primary">
+            <Link href={pageHref(result.page + 1)} className="inline-block py-1 font-medium text-primary">
               Next →
             </Link>
           ) : (

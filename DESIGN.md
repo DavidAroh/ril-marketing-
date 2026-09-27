@@ -188,3 +188,12 @@ Soft, modern, ruled: tags at pill radius, buttons 8px, cards/beds 10–12px, clo
 - **Don't** scatter blue as an accent, use kickers above headings, gradient text, glass, or hard offset shadows.
 - **Don't** set body copy or headings in monospace.
 - **Don't** invent testimonials, customers, benchmarks, or pricing; author demonstration data at full fidelity and label it synthetic.
+
+## Brand assets — later work
+
+These RIL Media Kit elements are committed brand but not yet built as assets:
+
+- **Signature shapes** — Momentum, Community, Flow, Excellence, Productivity: outline + semi-transparent fill of the outline colour; may be scaled, rotated, and combined into patterns. Secondary "Renaissance colours" apply to these/sub-brands only, never the logo.
+- **Illustration** — two stances: flat illustrations / doodles, and 3D illustrations.
+- **Blue confirmation** — the kit's text specifies hex only for White (#FFFFFF) and Black (#212120); the primary Blue lives in a colour swatch (image). The app ships **#177AE5** consistently; confirm this against the kit swatch and, if it differs, update `--ril-blue`, `--primary`/`--ring`/`--flag` (HSL), `--chart-1`, and this file's front-matter together.
+- **Voice for AI drafts** — the generation system prompt now carries the RIL voice (witty, optimistic, KISS, end on a high note) per the kit's "use a witty tone" mandate; keep it subordinate to the grounding rule.

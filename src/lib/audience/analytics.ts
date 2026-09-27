@@ -247,6 +247,7 @@ export interface CampaignRollupInput {
   leads: Array<{
     id: string;
     source_content_asset_id: string | null;
+    campaign_id?: string | null;
     is_qualified: boolean;
     is_converted: boolean;
   }>;
@@ -308,7 +309,7 @@ export function rollupCampaign(
   const assets = input.assets.filter((a) => a.campaign_id === campaignId);
   const assetIds = new Set(assets.map((a) => a.id));
   const leads = input.leads.filter(
-    (l) => l.source_content_asset_id && assetIds.has(l.source_content_asset_id)
+    (l) => l.campaign_id === campaignId || (l.source_content_asset_id && assetIds.has(l.source_content_asset_id))
   );
   const qualified = leads.filter((l) => l.is_qualified).length;
   const converted = leads.filter((l) => l.is_converted).length;

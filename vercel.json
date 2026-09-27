@@ -3,6 +3,22 @@
     {
       "path": "/api/cron/audience-insights",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/marketing-automation",
+      "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/trend-monitoring",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/email-delivery",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/scheduled-reports",
+      "schedule": "0 7 * * *"
     }
   ]
 }

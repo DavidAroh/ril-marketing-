@@ -95,10 +95,11 @@ export default async function LeadsPage({
       ) : (
         <ul className="ledger slip divide-y divide-border overflow-hidden">
           {result.leads.map((l, i) => (
-            <li
-              key={l.id}
-              className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6"
-            >
+            <li key={l.id}>
+              <Link
+                href={`/leads/${l.id}`}
+                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+              >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="dateline">{wireLabel(i)}</span>
@@ -129,6 +130,7 @@ export default async function LeadsPage({
                   </span>
                 ) : null}
               </div>
+              </Link>
             </li>
           ))}
         </ul>
@@ -137,7 +139,7 @@ export default async function LeadsPage({
       {totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="font-medium text-primary">
+            <Link href={pageHref(page - 1)} className="inline-block py-1 font-medium text-primary">
               ← Previous
             </Link>
           ) : (
@@ -147,7 +149,7 @@ export default async function LeadsPage({
             Page {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link href={pageHref(page + 1)} className="font-medium text-primary">
+            <Link href={pageHref(page + 1)} className="inline-block py-1 font-medium text-primary">
               Next →
             </Link>
           ) : (

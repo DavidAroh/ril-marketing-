@@ -4,6 +4,7 @@ import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listScheduled } from "@/lib/content/assets";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
+import { CalendarGenerator } from "@/components/content/calendar-generator";
 
 export const metadata: Metadata = { title: "Content Calendar" };
 
@@ -84,6 +85,8 @@ export default async function CalendarPage({
             Every approved asset with a date, in the order it goes out.
           </p>
         </div>
+        <div className="flex flex-wrap items-end gap-4">
+        <CalendarGenerator />
         <nav aria-label="Month" className="flex items-center gap-1">
           <Link
             href={`/calendar?m=${prev}`}
@@ -103,6 +106,7 @@ export default async function CalendarPage({
             →
           </Link>
         </nav>
+        </div>
       </div>
 
       {days.length === 0 ? (
