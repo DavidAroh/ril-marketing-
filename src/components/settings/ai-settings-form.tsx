@@ -87,7 +87,7 @@ export function AiSettingsForm({
   if (connected && !editing) {
     return (
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/30 px-3.5 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3.5 py-3">
           <div className="flex min-w-0 items-center gap-2.5">
             <AiProviderMark
               provider={justConnected ? provider : startProvider}
@@ -107,6 +107,7 @@ export function AiSettingsForm({
               type="button"
               variant="outline"
               size="sm"
+              className="min-h-9 rounded-lg font-semibold"
               onClick={() => setEditing(true)}
             >
               Change model
@@ -116,7 +117,7 @@ export function AiSettingsForm({
                 type="submit"
                 variant="ghost"
                 size="sm"
-                className="text-muted-foreground"
+                className="min-h-9 rounded-lg font-semibold text-muted-foreground"
                 disabled={disconnecting}
               >
                 {disconnecting ? "Disconnecting…" : "Disconnect"}
@@ -145,8 +146,8 @@ export function AiSettingsForm({
   return (
     <form action={connectAction} className="flex flex-col gap-4">
       <fieldset>
-        <legend className="text-sm font-medium">1. Which provider?</legend>
-        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        <legend className="text-sm font-semibold tracking-[-0.01em]">1. Which provider?</legend>
+        <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
           {PROVIDER_KEYS.map((key) => {
             const option = PROVIDERS[key];
             const isSelected = provider === key;
@@ -154,7 +155,7 @@ export function AiSettingsForm({
               <label
                 key={key}
                 className={cn(
-                  "cursor-pointer rounded-md border p-3 transition-colors",
+                  "cursor-pointer rounded-lg border p-4 outline-none transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-ring",
                   isSelected
                     ? "border-primary bg-primary/5 ring-1 ring-primary"
                     : "border-border hover:bg-accent"
@@ -175,7 +176,7 @@ export function AiSettingsForm({
                   />
                   <span className="text-sm font-semibold">{option.label}</span>
                 </span>
-                <span className="mt-1.5 block text-xs leading-5 text-muted-foreground">
+                <span className="mt-1.5 block text-[13px] leading-5 text-muted-foreground">
                   {option.tagline}
                 </span>
               </label>
@@ -184,13 +185,14 @@ export function AiSettingsForm({
         </div>
       </fieldset>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label htmlFor="ai-model-select" className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
         2. Which model?
         <select
+          id="ai-model-select"
           name="model"
           value={model}
           onChange={(e) => setModel(e.target.value)}
-          className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm font-normal shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="h-10 w-full rounded-lg border border-input bg-transparent px-3 text-sm font-normal shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {def.models.map((option) => (
             <option key={option.id} value={option.id}>
@@ -198,21 +200,22 @@ export function AiSettingsForm({
             </option>
           ))}
         </select>
-        <span className="text-xs font-normal text-muted-foreground">
+        <span className="text-[13px] font-normal leading-5 text-muted-foreground">
           {selected.hint}
         </span>
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
-        3. Paste your {def.label} API key
+      <label htmlFor="ai-api-key" className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
+        3. {initial.hasKey ? "API key" : `Paste your ${def.label} API key`}
         <Input
+          id="ai-api-key"
           name="apiKey"
           type="password"
           autoComplete="off"
           placeholder={def.keyPlaceholder}
-          className="font-normal"
+          className="h-10 rounded-lg font-normal"
         />
-        <span className="flex flex-wrap items-center gap-x-1.5 text-xs font-normal text-muted-foreground">
+        <span className="flex flex-wrap items-center gap-x-1.5 text-[13px] font-normal leading-5 text-muted-foreground">
           {initial.hasKey
             ? "Leave blank to keep the key you already saved."
             : def.keyHelp}
@@ -220,7 +223,7 @@ export function AiSettingsForm({
             href={def.keyUrl}
             target="_blank"
             rel="noreferrer noopener"
-            className="font-medium text-primary underline-offset-4 hover:underline"
+            className="inline-flex min-h-9 items-center rounded-md px-1 font-semibold text-primary underline-offset-4 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ring"
           >
             {KEY_URL_LABEL}
           </a>
@@ -228,8 +231,14 @@ export function AiSettingsForm({
       </label>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" disabled={connecting}>
-          {connecting ? "Checking your key…" : `4. Connect ${def.label}`}
+        <Button type="submit" disabled={connecting} className="min-h-10 rounded-lg px-4 font-semibold">
+          {initial.hasKey
+            ? connecting
+              ? "Checking your key…"
+              : "Save changes"
+            : connecting
+              ? "Checking your key…"
+              : `4. Connect ${def.label}`}
         </Button>
         {initial.hasKey ? (
           <Button

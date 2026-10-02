@@ -38,7 +38,7 @@ export function LandingPageForm({
     <form action={action} className="slip flex flex-col gap-4 p-5 sm:p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={field}><span className="dateline">Internal page name</span><Input name="title" required minLength={3} maxLength={160} defaultValue={page?.title ?? ""} placeholder="Founder programme applications" /></label>
-        <label className={field}><span className="dateline">Public URL slug</span><Input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={80} defaultValue={page?.slug ?? ""} placeholder="founder-programme"/><span className="text-xs text-muted-foreground">Published at /p/your-slug</span></label>
+        <label className={field}><span className="dateline">Public URL slug</span><Input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={80} defaultValue={page?.slug ?? ""} placeholder="founder-programme"/><span className="text-xs text-muted-foreground">The public link includes this slug and a unique page ID.</span></label>
       </div>
       <label className={field}><span className="dateline">Public headline</span><Input name="headline" required minLength={5} maxLength={200} defaultValue={page?.headline ?? ""} placeholder="Build what comes next." /></label>
       <label className={field}><span className="dateline">Page copy</span><Textarea name="body" rows={8} maxLength={6000} defaultValue={page?.body ?? ""} placeholder="Describe the programme, who it serves, and the opportunity. Plain text only." /></label>

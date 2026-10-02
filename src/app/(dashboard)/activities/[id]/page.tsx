@@ -7,6 +7,7 @@ import { GenerateFromActivity } from "@/components/content/generate-from-activit
 import { formatDay } from "@/lib/format";
 import { listActivityAttachments } from "@/lib/content/attachments";
 import { ActivityAttachments } from "@/components/content/activity-attachments";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Activity" };
@@ -22,42 +23,43 @@ export default async function ActivityDetailPage({
 
 	const activity = await getActivity(orgId, id);
 	if (!activity) notFound();
-	const attachments = await listActivityAttachments(orgId, id).catch(() => []);
+	const attachments = await listActivityAttachments(orgId, id);
 
 	const facts: Array<{ label: string; value: string }> = [
 		{ label: "Event date", value: formatDay(activity.event_date) },
 		{ label: "Segment", value: activity.segment?.name ?? "Untagged" },
 		{
 			label: "Speakers",
-			value: activity.speakers.length ? activity.speakers.join(", ") : "—",
+			value: activity.speakers.length ? activity.speakers.join(", ") : "None listed",
 		},
 		{
 			label: "Partners",
-			value: activity.partners.length ? activity.partners.join(", ") : "—",
+			value: activity.partners.length ? activity.partners.join(", ") : "None listed",
 		},
 	];
 
 	return (
-		<div className="flex flex-col gap-4 md:gap-6">
+		<div className="workspace-page flex flex-col gap-4 md:gap-6">
 			<header>
-				<div className="flex flex-wrap items-start justify-between gap-3">
+				<div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
 				<div>
 				<Link
 					href="/activities"
-					className="dateline transition-colors hover:text-foreground"
+					className="group inline-flex min-h-9 items-center gap-1.5 rounded-md text-[13px] font-semibold text-primary outline-none transition-colors hover:text-primary/80 focus-visible:ring-2 focus-visible:ring-ring"
 				>
-					← Activities
+					<ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden="true" />
+					All activities
 				</Link>
-				<h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+				<h1>
 					{activity.title}
 				</h1>
 				{activity.description ? (
-					<p className="mt-2 max-w-[68ch] text-sm leading-6 text-muted-foreground">
+					<p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
 						{activity.description}
 					</p>
 				) : null}
 				</div>
-				<Button asChild variant="outline"><Link href={`/activities/${activity.id}/edit`}>Edit activity</Link></Button>
+				<Button asChild variant="outline" className="min-h-10 rounded-lg px-4 text-[13px] font-semibold"><Link href={`/activities/${activity.id}/edit`}>Edit activity</Link></Button>
 				</div>
 			</header>
 
@@ -82,7 +84,7 @@ export default async function ActivityDetailPage({
 									href={activity.registration_url}
 									target="_blank"
 									rel="noreferrer"
-									className="max-w-[60%] truncate text-sm font-medium text-primary hover:underline"
+									className="-my-1.5 inline-block max-w-[60%] truncate py-1.5 text-sm font-medium text-primary hover:underline"
 								>
 									{activity.registration_url}
 								</a>
@@ -90,7 +92,7 @@ export default async function ActivityDetailPage({
 						) : null}
 					</div>
 					{activity.outcomes ? (
-						<div className="border-t border-border px-5 py-4 sm:px-6">
+						<div className="border-t border-border/80 px-5 py-4 sm:px-6">
 							<p className="dateline">Key outcomes</p>
 							<p className="mt-1.5 text-sm leading-6 text-foreground">
 								{activity.outcomes}

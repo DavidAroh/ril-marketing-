@@ -9,6 +9,7 @@ import {
   type IntegrationResult,
 } from "@/actions/integrations";
 import { ConnectorCard } from "@/components/settings/connector-card";
+import { ChannelMark } from "@/components/settings/channel-icons";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -70,32 +71,46 @@ export function BufferConnector({
               {channelList.map((channel) => (
                 <li
                   key={channel.id}
-                  className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 py-1 pl-2 pr-2.5 text-xs text-muted-foreground"
                 >
-                  <span className="font-medium text-foreground">
-                    {channel.descriptor}
+                  <ChannelMark
+                    service={channel.service}
+                    descriptor={channel.descriptor}
+                    className="size-3.5 shrink-0 text-foreground"
+                  />
+                  <span className="min-w-0">
+                    <span className="font-medium text-foreground">
+                      {channel.descriptor}
+                    </span>
+                    {channel.name ? ` · ${channel.name}` : ""}
                   </span>
-                  {channel.name ? ` · ${channel.name}` : ""}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[13px] leading-5 text-muted-foreground">
               No channels linked yet. Connect your social accounts inside
               Buffer, then refresh.
             </p>
           )}
 
           {needsAttention.length > 0 ? (
-            <ul className="flex flex-col gap-1 text-xs text-amber-700 dark:text-amber-400">
+            <ul className="flex flex-col gap-1.5 text-[13px] leading-5 text-amber-700 dark:text-amber-400">
               {needsAttention.map((channel) => (
-                <li key={channel.id}>
-                  {channel.descriptor}
-                  {channel.isDisconnected
-                    ? " is disconnected — reconnect it in Buffer."
-                    : channel.isLocked
-                      ? " is locked by your Buffer plan."
-                      : " has a paused queue, so scheduled posts will not go out."}
+                <li key={channel.id} className="flex items-start gap-1.5">
+                  <ChannelMark
+                    service={channel.service}
+                    descriptor={channel.descriptor}
+                    className="mt-[0.2rem] size-3.5 shrink-0"
+                  />
+                  <span className="min-w-0">
+                    {channel.descriptor}
+                    {channel.isDisconnected
+                      ? " is disconnected — reconnect it in Buffer."
+                      : channel.isLocked
+                        ? " is locked by your Buffer plan."
+                        : " has a paused queue, so scheduled posts will not go out."}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -129,7 +144,7 @@ export function BufferConnector({
           <a href="/api/integrations/buffer/connect">Connect Buffer</a>
         </Button>
       ) : (
-        <p className="max-w-[60ch] text-xs leading-5 text-muted-foreground">
+        <p className="max-w-[60ch] text-[13px] leading-5 text-muted-foreground">
           Social publishing isn&apos;t switched on for this workspace yet. Ask a
           workspace owner to enable Buffer, then come back to this page.
         </p>

@@ -1,10 +1,15 @@
 ---
 name: RIL Audience Intelligence
+<<<<<<< ours
 description: Open Lab runs the bench in RIL blue, black ink, and Open Sans.
+=======
+description: Authenticated marketing workspace for human-reviewed intelligence, content, leads, and operations.
+>>>>>>> theirs
 colors:
   white: "#ffffff"
   ink: "#212120"
   blue: "#177ae5"
+<<<<<<< ours
   blue-deep: "#0f5ca8"
   soft: "#3e4a56"
   line: "#d9e2ec"
@@ -197,3 +202,40 @@ These RIL Media Kit elements are committed brand but not yet built as assets:
 - **Illustration** — two stances: flat illustrations / doodles, and 3D illustrations.
 - **Blue confirmation** — the kit's text specifies hex only for White (#FFFFFF) and Black (#212120); the primary Blue lives in a colour swatch (image). The app ships **#177AE5** consistently; confirm this against the kit swatch and, if it differs, update `--ril-blue`, `--primary`/`--ring`/`--flag` (HSL), `--chart-1`, and this file's front-matter together.
 - **Voice for AI drafts** — the generation system prompt now carries the RIL voice (witty, optimistic, KISS, end on a high note) per the kit's "use a witty tone" mandate; keep it subordinate to the grounding rule.
+=======
+  paper: "#f6f6f4"
+  line: "#d9e2ec"
+  red: "#b3261e"
+typography:
+  family: "Open Sans, system-ui, sans-serif"
+---
+
+# Dashboard design system — RIL Marketing Workspace
+
+The authenticated application is a printed flat plan: the month's work laid out as one ruled grid of content cells, each carrying its own stamped gate state. This replaces the earlier SaaS card-wall world (dark navigation rail, dark analytics modules, KPI card grid) across every dashboard route. Public landing and authentication pages retain their own presentation; the RIL brand mark, Open Sans, and the human approval principle remain shared.
+
+## Work model
+
+The main job is to scan what needs a decision, decide, and patch through so only approved intelligence feeds repurposing and the calendar. The plan sheet is densest where decisions live: a blue band flags the awaiting cells, queues and schedule follow as ruled sections, counts print in the gutter with leader lines, and the week runs along the sheet's bottom rule. Every cell wears its gate state as a stamped word — nothing auto-applies and nothing is implicit.
+
+## Visual rules
+
+- Bright warm paper ground (#f6f6f4), white plan sheets, ink #212120 type. Hairline rules #D9E2EC are the only divider; sheets are square-cornered (2–4px radius, no shadows). No floating cards — every module is a ruled region of a sheet.
+- RIL blue #177AE5 appears only as whole fields: the decision band, the selected navigation item, primary action stamps, today's cell in the week strip. Never tinted icons or accent borders. Red #B3261E is reserved for what needs action. Ink outlines name settled states; quiet paper names inactive ones.
+- Open Sans throughout: 800 tracked-uppercase for band heads and status stamps, 700 heads, 400/650 body, tabular figures for every count. Cell codes (D-01, F-01, T-01, S-01, A-01) are stable addresses so rows can be called out by number.
+- Charts are printed, not plotted: content mix is a share-of-column composition bar (blue leads, ink tints follow, aggregation buckets print last) over a ruled ledger; KPI progress is ink bars over a ticked ruler track with dashed hairlines for awaiting measurements.
+- Gutter counts use dotted leader lines pinning each number to its label, like a contents page. The week strip prints seven ruled day cells with today as the blue field.
+- Route intros: dateline in tracked uppercase, one display head, the day's actions to the right. Underline-rule filters and text-first states carry over from the prior system unchanged. Loading skeletons mirror the plan sheet structure exactly.
+
+## Antislop dials
+
+ENERGY 1 / RHYTHM 2 / MOTION 1. One authored moment: the blue decision band against ruled paper. No entrance animations on the sheet; motion is limited to 160ms background/colour transitions and the 1px active press.
+
+## Shared components and states
+
+`AppShell`, `AppSidebar` (paper index rail with the horizontal black logo), `AppHeader` (thin ruled masthead), `.flatplan`, `.plan-sheet`, `.plan-band` / `.plan-band-decision`, `.plan-cell`, `.plan-gutter`, `.week-strip`, `.ledger-sheet`, `.plan-module`, `StatusStamp`, shared buttons and inputs establish one rhythm across all authenticated routes. Status stamps: blue fields await decision, ink outlines are settled, red is urgent, quiet paper is inactive. Visible focus ring, `aria-current`, 44px touch targets below 768px, and zero horizontal overflow at 390px are required.
+
+## Product truth
+
+Only approved insights feed recommendations. Drafts, scheduled work, lead contact, reports, integrations, and automation preserve their existing human gates and organization scoping. Counts are real; capped queues (5 follow-ups / 8 tasks) print "+" so the sheet never understates. No value is illustrative unless explicitly labeled.
+>>>>>>> theirs

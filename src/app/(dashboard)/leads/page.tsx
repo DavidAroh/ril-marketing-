@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listLeads } from "@/lib/leads/leads";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
-import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { scoreLabel } from "@/lib/leads/scoring";
+import { formatDay, todayDateline } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Leads" };
 
@@ -30,9 +30,9 @@ export default async function LeadsPage({
     : "all";
   const page = Math.max(1, Number(sp.page) || 1);
 
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const result = orgId
-    ? await listLeads(orgId, { stage, page }).catch(() => ({ leads: [], total: 0 }))
+    ? await listLeads(orgId, { stage, page })
     : { leads: [], total: 0 };
 
   const pageSize = 20;
@@ -50,33 +50,26 @@ export default async function LeadsPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
       <div>
         <p className="dateline">
           {todayDateline()} · {result.total} leads
         </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1>
           Leads
         </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          Every lead RIL&apos;s marketing generates, its funnel stage, and an
-          explainable score — Awareness → Engagement → Lead Capture → Nurturing
-          → Conversion → Retention.
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+          Track every lead through the funnel and see why each score was assigned.
         </p>
       </div>
 
-      <nav aria-label="Filter by stage" className="flex flex-wrap gap-2">
+      <nav aria-label="Filter by stage" className="flex flex-wrap">
         {STAGES.map((s) => (
           <Link
             key={s}
             href={stageHref(s)}
             aria-current={stage === s ? "page" : undefined}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.06em] transition-colors",
-              stage === s
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
-            )}
+            className="capitalize"
           >
             {s === "all" ? "All" : s}
           </Link>
@@ -93,29 +86,28 @@ export default async function LeadsPage({
           }
         />
       ) : (
-        <ul className="ledger slip divide-y divide-border overflow-hidden">
-          {result.leads.map((l, i) => (
+        <ul className="ledger slip overflow-hidden">
+          {result.leads.map((l) => (
             <li key={l.id}>
               <Link
                 href={`/leads/${l.id}`}
-                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+                className="flex items-start justify-between gap-4 rounded-lg px-5 py-4 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6"
               >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="dateline">{wireLabel(i)}</span>
                   <StatusStamp variant="scheduled">{l.funnel_stage}</StatusStamp>
                   {l.is_qualified ? <StatusStamp status="qualified" /> : null}
                   {l.is_converted ? <StatusStamp status="converted" /> : null}
                 </div>
-                <p className="mt-1.5 truncate text-sm font-medium text-foreground">
+                <p className="mt-1.5 truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
                   {l.name || l.email || "Unnamed lead"}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                <p className="mt-0.5 truncate text-[13px] leading-5 text-muted-foreground">
                   {[l.organisation, l.email, l.interest].filter(Boolean).join(" · ") ||
                     "No details recorded"}
                 </p>
                 {l.score_reason ? (
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  <p className="mt-0.5 truncate text-[13px] leading-5 text-muted-foreground">
                     Why: {l.score_reason}
                   </p>
                 ) : null}
@@ -125,8 +117,8 @@ export default async function LeadsPage({
                   {formatDay(l.created_at)}
                 </span>
                 {l.score ? (
-                  <span className="mt-1 block text-sm font-bold tabular-nums text-foreground">
-                    {l.score}
+                  <span className="mt-1.5 flex justify-end">
+                    <StatusStamp status={l.score}>{scoreLabel(l.score)}</StatusStamp>
                   </span>
                 ) : null}
               </div>
@@ -139,7 +131,7 @@ export default async function LeadsPage({
       {totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(page - 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               ← Previous
             </Link>
           ) : (
@@ -149,7 +141,7 @@ export default async function LeadsPage({
             Page {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link href={pageHref(page + 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(page + 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               Next →
             </Link>
           ) : (

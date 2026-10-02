@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>J — Marketing overview</title>
+<style>
+  body { margin: 0; background: #101210; color: #e6e9e2;
+         font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .mono { font-family: Consolas, "Courier New", monospace; }
+  .page { padding: 48px 56px 96px; }
+  .bar { display: flex; justify-content: space-between; align-items: baseline;
+         margin-bottom: 56px; }
+  h1 { font-size: 13px; font-weight: 700; letter-spacing: 0.3em;
+       text-transform: uppercase; margin: 0; }
+  .date { font-family: Consolas, "Courier New", monospace; font-size: 11px;
+          letter-spacing: 0.12em; color: #7e857a; }
+  .sub { font-size: 12.5px; color: #7e857a; margin: -40px 0 64px; }
+  .tick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+          font-family: Consolas, "Courier New", monospace; margin-bottom: 72px; }
+  .tick .c .v { font-size: 42px; font-weight: 700; letter-spacing: -0.02em;
+                line-height: 1; margin: 0; color: #d8e84a; }
+  .tick .c .l { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+                color: #7e857a; margin: 8px 0 0; }
+  .wire { display: grid; grid-template-columns: 90px 1fr 200px 130px; gap: 0 28px;
+          padding: 14px 0; align-items: baseline; }
+  .wire .no { font-family: Consolas, "Courier New", monospace; font-size: 11px;
+              color: #7e857a; }
+  .wire .t { font-size: 15.5px; font-weight: 600; line-height: 1.4; margin: 0; }
+  .wire .meta { font-family: Consolas, "Courier New", monospace; font-size: 10.5px;
+                letter-spacing: 0.08em; text-transform: uppercase; color: #7e857a;
+                margin: 0; }
+  .wire .meta .st { color: #d8e84a; }
+  .wire .meta .alert { color: #ff7a5c; }
+  .wire .go { font-family: Consolas, "Courier New", monospace; font-size: 10.5px;
+              letter-spacing: 0.16em; text-transform: uppercase; color: #e6e9e2;
+              text-align: right; }
+  .band { margin-bottom: 64px; }
+  .bandhead { display: flex; justify-content: space-between; align-items: baseline;
+              margin-bottom: 10px; }
+  .bandhead .h { font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase;
+                 color: #7e857a; margin: 0; }
+  .bandhead .r { font-family: Consolas, "Courier New", monospace; font-size: 10.5px;
+                 color: #d8e84a; margin: 0; }
+  .weekstrip { font-family: Consolas, "Courier New", monospace; font-size: 12px;
+               letter-spacing: 0.06em; color: #7e857a; padding: 12px 0; }
+  .weekstrip b { color: #e6e9e2; font-weight: 400; }
+  .weekstrip .zero { color: #3c4038; }
+  .gate { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+          color: #7e857a; }
+  .gate b { color: #d8e84a; font-weight: 400; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="bar">
+      <h1>Marketing overview</h1>
+      <p class="date">WED 30 SEP 2026</p>
+    </div>
+    <p class="sub">Your priorities, publishing schedule, and performance in one place.</p>
+
+    <div class="tick">
+      <div class="c"><p class="v">3</p><p class="l">Awaiting decision</p></div>
+      <div class="c"><p class="v">0</p><p class="l">Scheduled · 30d</p></div>
+      <div class="c"><p class="v">22</p><p class="l">Leads captured</p></div>
+      <div class="c"><p class="v">11</p><p class="l">Content assets</p></div>
+    </div>
+
+    <div class="band">
+      <div class="bandhead">
+        <p class="h">Needs your decision</p>
+        <p class="r">7 ITEMS</p>
+      </div>
+
+      <div class="wire">
+        <span class="no">01</span>
+        <p class="t">SME owners who attended a webinar registered for the Growth Lab at a higher rate than those reached by social alone.</p>
+        <p class="meta"><span class="st">PENDING REVIEW</span> · EMERGING</p>
+        <p class="go">REVIEW →</p>
+      </div>
+      <div class="wire">
+        <span class="no">02</span>
+        <p class="t">Students who engaged with two or more campus posts were markedly more likely to open a later email.</p>
+        <p class="meta"><span class="st">PENDING REVIEW</span> · STABLE</p>
+        <p class="go">REVIEW →</p>
+      </div>
+      <div class="wire">
+        <span class="no">03</span>
+        <p class="t">Clip: the question that changed the room</p>
+        <p class="meta"><span class="st">IN REVIEW</span> · INSTAGRAM</p>
+        <p class="go">OPEN →</p>
+      </div>
+      <div class="wire">
+        <span class="no">04</span>
+        <p class="t">Instagram post failed to publish — re-authorise the channel</p>
+        <p class="meta"><span class="alert">PUBLISH FAILED</span> · TASK</p>
+        <p class="go">REVIEW →</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="bandhead">
+        <p class="h">Publishing rhythm</p>
+        <p class="r">28 SEPT – 4 OCT</p>
+      </div>
+      <p class="weekstrip">MON <span class="zero">0</span> · TUE <span class="zero">0</span> · WED <span class="zero">0</span> · <b>THU 1</b> · <b>FRI 1</b> · SAT <span class="zero">0</span> · SUN <span class="zero">0</span></p>
+      <div class="wire">
+        <span class="no">05</span>
+        <p class="t">Next up: Cohort 4 thread on x — Thursday 1 October, 14:48</p>
+        <p class="meta"><span class="st">SCHEDULED</span></p>
+        <p class="go">CALENDAR →</p>
+      </div>
+      <div class="wire">
+        <span class="no">06</span>
+        <p class="t">Five leads want follow-up, starting with Tunde Bakare Okafor — score warm</p>
+        <p class="meta"><span class="st">FOLLOW-UP</span> · 5+ LEADS</p>
+        <p class="go">ALL LEADS →</p>
+      </div>
+    </div>
+
+    <p class="gate"><b>AI RECOMMENDS.</b> YOU APPROVE.</p>
+  </div>
+</body>
+</html>

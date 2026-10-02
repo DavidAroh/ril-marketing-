@@ -10,6 +10,7 @@ import {
 	TrendingUpIcon,
 	UserPlusIcon,
 	MailIcon,
+	SproutIcon,
 	FileChartColumnIncreasingIcon,
 	MessageCircleMoreIcon,
 	WorkflowIcon,
@@ -18,6 +19,8 @@ import {
 	BotIcon,
 	PanelsTopLeftIcon,
 	FileSearchIcon,
+	ClipboardCheckIcon,
+	ChartNoAxesCombinedIcon,
 } from "lucide-react";
 
 export type SidebarNavItem = {
@@ -46,10 +49,11 @@ export const navGroups: SidebarNavGroup[] = [
 				path: "/dashboard",
 				icon: <LayoutDashboardIcon />,
 			},
+			{ title: "Approvals", path: "/approvals", icon: <ClipboardCheckIcon /> },
 		],
 	},
 	{
-		label: "Essentials",
+		label: "Create & publish",
 		items: [
 			{ title: "Activities", path: "/activities", icon: <NotebookPenIcon /> },
 			{ title: "Content Library", path: "/library", icon: <LibraryIcon /> },
@@ -58,7 +62,7 @@ export const navGroups: SidebarNavGroup[] = [
 		],
 	},
 	{
-		label: "Intelligence",
+		label: "Audience & strategy",
 		items: [
 			{ title: "Segments", path: "/audience/segments", icon: <UsersIcon /> },
 			{ title: "Insights", path: "/audience/insights", icon: <LightbulbIcon /> },
@@ -68,17 +72,19 @@ export const navGroups: SidebarNavGroup[] = [
 		],
 	},
 	{
-		label: "Growth",
+		label: "Reach & grow",
 		items: [
 			{ title: "Leads", path: "/leads", icon: <UserPlusIcon /> },
 			{ title: "Email", path: "/email", icon: <MailIcon /> },
+			{ title: "Nurture", path: "/nurture", icon: <SproutIcon /> },
 			{ title: "Reports", path: "/reports", icon: <FileChartColumnIncreasingIcon /> },
+			{ title: "Analytics", path: "/analytics", icon: <ChartNoAxesCombinedIcon /> },
 			{ title: "Community Inbox", path: "/community", icon: <MessageCircleMoreIcon /> },
 			{ title: "Landing Pages", path: "/audience/landing-pages", icon: <PanelsTopLeftIcon /> },
 		],
 	},
 	{
-		label: "Workspace",
+		label: "Settings",
 		items: [
 			{ title: "Automation", path: "/settings/automation", icon: <WorkflowIcon /> },
 			{ title: "Brand Knowledge", path: "/settings/brand", icon: <BookOpenIcon /> },

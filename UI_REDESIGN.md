@@ -1,3 +1,5 @@
+> Dashboard direction updated: see [DASHBOARD_REDESIGN.md](DASHBOARD_REDESIGN.md). Its modern SaaS workspace guidance supersedes the Open Lab dashboard rules below.
+
 # RIL AI Marketing Operating System — Complete UI Redesign
 
 **Design Philosophy:** Marketing workspace, not engineering dashboard. Every screen answers "what needs my attention" before "what data exists." The Studio aesthetic (calm cards, stamped statuses, hairline dividers) extends across the full platform.

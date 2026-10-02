@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizationId } from "@/lib/supabase/organization";
-import { getUserRole, requireReviewer } from "@/lib/audience/access";
+import { requireReviewer } from "@/lib/audience/access";
+import { publicLandingPagePath } from "@/lib/landing-page-url";
 
 export interface LandingPageActionResult { ok: boolean; id?: string; error?: string; }
 
@@ -93,7 +94,7 @@ export async function updateLandingPage(
     if (error) return { ok: false, error: error.code === "23505" ? "That URL slug is already in use." : error.message };
     revalidatePath("/audience/landing-pages");
     revalidatePath(`/audience/landing-pages/${pageId}`);
-    revalidatePath(`/p/${parsed.data.slug}`);
+    revalidatePath(publicLandingPagePath({ id: pageId, slug: parsed.data.slug }));
     return { ok: true, id: pageId };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Could not update page." };
@@ -128,7 +129,7 @@ export async function setLandingPageStatus(
     if (error) return { ok: false, error: error.message };
     revalidatePath("/audience/landing-pages");
     revalidatePath(`/audience/landing-pages/${pageId}`);
-    revalidatePath(`/p/${page.slug}`);
+    revalidatePath(publicLandingPagePath({ id: pageId, slug: page.slug }));
     return { ok: true, id: pageId };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Could not update page status." };

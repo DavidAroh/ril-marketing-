@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MailIcon } from "lucide-react";
+import { CheckCircle2, MailIcon, Sparkles, TriangleAlert } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { createClient } from "@/lib/supabase/server";
 import { getAiIntegration } from "@/lib/ai/provider";
@@ -13,6 +14,7 @@ import { AiSettingsForm } from "@/components/settings/ai-settings-form";
 import { BufferConnector } from "@/components/settings/buffer-connector";
 import { ConnectorCard } from "@/components/settings/connector-card";
 import { WordPressSettingsForm } from "@/components/settings/wordpress-settings-form";
+import { StrapiSettingsForm } from "@/components/settings/strapi-settings-form";
 import { GoogleAnalyticsSettingsForm } from "@/components/settings/google-analytics-settings-form";
 import { todayDateline } from "@/lib/format";
 
@@ -30,6 +32,7 @@ const CONNECTOR_KEYS = new Set([
   "ai",
   "buffer",
   "cms_wordpress",
+  "cms_strapi",
   "google_analytics",
   "email_resend",
 ]);
@@ -42,7 +45,7 @@ export default async function AiSettingsPage({
   searchParams: Promise<{ connected?: string; connect_error?: string }>;
 }) {
   const search = await searchParams;
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
 
   const ai = orgId ? await getAiIntegration(orgId).catch(() => null) : null;
 
@@ -57,6 +60,23 @@ export default async function AiSettingsPage({
     propertyId: string;
     searchConsoleSiteUrl: string;
   } = { connected: false, propertyId: "", searchConsoleSiteUrl: "" };
+  let strapi: {
+    connected: boolean;
+    baseUrl: string;
+    collection: string;
+    titleField: string;
+    bodyField: string;
+    slugField: string;
+    excerptField: string;
+  } = {
+    connected: false,
+    baseUrl: "",
+    collection: "",
+    titleField: "",
+    bodyField: "",
+    slugField: "",
+    excerptField: "",
+  };
   let buffer: Awaited<ReturnType<typeof getBufferStatus>> = {
     connected: false,
     channels: [],
@@ -69,31 +89,48 @@ export default async function AiSettingsPage({
   if (orgId) {
     try {
       const supabase = await createClient();
-      const [list, wordpressResult, analyticsResult] = await Promise.all([
-        supabase
-          .from("integrations")
-          .select("key, display_name, status, updated_at")
-          .eq("organization_id", orgId)
-          .order("updated_at", { ascending: false }),
-        supabase
-          .from("integrations")
-          .select("status,config")
-          .eq("organization_id", orgId)
-          .eq("key", "cms_wordpress")
-          .maybeSingle<{
-            status: string;
-            config: { siteUrl?: string; username?: string };
-          }>(),
-        supabase
-          .from("integrations")
-          .select("status,config")
-          .eq("organization_id", orgId)
-          .eq("key", "google_analytics")
-          .maybeSingle<{
-            status: string;
-            config: { ga4PropertyId?: string; searchConsoleSiteUrl?: string };
-          }>(),
-      ]);
+      const [list, wordpressResult, analyticsResult, strapiResult] =
+        await Promise.all([
+          supabase
+            .from("integrations")
+            .select("key, display_name, status, updated_at")
+            .eq("organization_id", orgId)
+            .order("updated_at", { ascending: false }),
+          supabase
+            .from("integrations")
+            .select("status,config")
+            .eq("organization_id", orgId)
+            .eq("key", "cms_wordpress")
+            .maybeSingle<{
+              status: string;
+              config: { siteUrl?: string; username?: string };
+            }>(),
+          supabase
+            .from("integrations")
+            .select("status,config")
+            .eq("organization_id", orgId)
+            .eq("key", "google_analytics")
+            .maybeSingle<{
+              status: string;
+              config: { ga4PropertyId?: string; searchConsoleSiteUrl?: string };
+            }>(),
+          supabase
+            .from("integrations")
+            .select("status,config")
+            .eq("organization_id", orgId)
+            .eq("key", "cms_strapi")
+            .maybeSingle<{
+              status: string;
+              config: {
+                baseUrl?: string;
+                collection?: string;
+                titleField?: string;
+                bodyField?: string;
+                slugField?: string;
+                excerptField?: string;
+              };
+            }>(),
+        ]);
       integrations = (list.data ?? []) as IntegrationRow[];
       if (wordpressResult.data) {
         wordpress = {
@@ -108,6 +145,17 @@ export default async function AiSettingsPage({
           propertyId: analyticsResult.data.config.ga4PropertyId ?? "",
           searchConsoleSiteUrl:
             analyticsResult.data.config.searchConsoleSiteUrl ?? "",
+        };
+      }
+      if (strapiResult.data) {
+        strapi = {
+          connected: strapiResult.data.status === "connected",
+          baseUrl: strapiResult.data.config.baseUrl ?? "",
+          collection: strapiResult.data.config.collection ?? "",
+          titleField: strapiResult.data.config.titleField ?? "",
+          bodyField: strapiResult.data.config.bodyField ?? "",
+          slugField: strapiResult.data.config.slugField ?? "",
+          excerptField: strapiResult.data.config.excerptField ?? "",
         };
       }
     } catch {
@@ -132,20 +180,18 @@ export default async function AiSettingsPage({
   const aiConnected = serverKey || Boolean(ai?.hasKey);
   const startProvider = isProviderKey(ai?.provider) ? ai.provider : "openai";
   const resendConnected = Boolean(resend);
-  const connectedCount = [buffer.connected, wordpress.connected, googleAnalytics.connected, resendConnected]
+  const connectedCount = [buffer.connected, wordpress.connected, strapi.connected, googleAnalytics.connected, resendConnected]
     .filter(Boolean).length;
   const otherIntegrations = integrations.filter(
     (row) => !CONNECTOR_KEYS.has(row.key)
   );
 
   return (
-    <div className="flex flex-col gap-5 md:gap-7">
+    <div className="workspace-page flex flex-col gap-5 md:gap-7">
       <header>
         <p className="dateline">{todayDateline()} · Setup</p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
-          AI &amp; integrations
-        </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
+        <h1>AI &amp; integrations</h1>
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
           Bring your own AI key and connect the accounts you publish from.
           Nothing here posts, sends or publishes on its own.
         </p>
@@ -154,35 +200,51 @@ export default async function AiSettingsPage({
       {search.connect_error ? (
         <p
           role="alert"
-          className="slip border-destructive/40 px-5 py-3 text-sm text-destructive sm:px-6"
+          className="slip flex items-start gap-3 rounded-lg border-destructive/40 px-5 py-4 text-sm leading-6 text-destructive sm:px-6"
         >
-          {search.connect_error}
+          <TriangleAlert className="mt-1 size-4 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">{search.connect_error}</span>
         </p>
       ) : null}
       {search.connected ? (
         <p
           role="status"
-          className="slip px-5 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-400 sm:px-6"
+          className="slip flex items-start gap-3 px-5 py-4 text-sm font-semibold leading-6 text-emerald-700 dark:text-emerald-400 sm:px-6"
         >
+          <CheckCircle2 className="mt-1 size-4 shrink-0" aria-hidden="true" />
           Connected. Your channels are ready to use.
         </p>
       ) : null}
 
       {/* ── AI provider ───────────────────────────────────────────────── */}
       <section
+        id="ai-provider"
         aria-labelledby="ai-provider-heading"
-        className="slip px-5 py-4 sm:px-6"
+        className="slip scroll-mt-20 px-5 py-5 sm:px-6"
       >
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3">
-          <div>
-            <h2 id="ai-provider-heading" className="text-base font-bold">
-              Your AI provider
-            </h2>
-            <p className="mt-0.5 max-w-[62ch] text-xs leading-5 text-muted-foreground">
-              Choose a provider, pick the model you want, paste your key and
-              connect. Your assistant and every new draft start using it
-              straight away. The key stays in this workspace.
-            </p>
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/80 pb-4">
+          <div className="flex min-w-0 items-start gap-3.5">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border [&_svg]:size-4",
+                aiConnected
+                  ? "border-emerald-600/20 bg-emerald-600/5 text-emerald-700 dark:text-emerald-400"
+                  : "border-border bg-muted/40 text-muted-foreground"
+              )}
+            >
+              <Sparkles />
+            </span>
+            <div className="min-w-0">
+              <h2 id="ai-provider-heading" className="text-[17px] font-bold tracking-[-0.02em]">
+                Your AI provider
+              </h2>
+              <p className="mt-1 max-w-[62ch] text-[13px] leading-5 text-muted-foreground">
+                Choose a provider, pick the model you want, paste your key and
+                connect. Your assistant and every new draft start using it
+                straight away. The key stays in this workspace.
+              </p>
+            </div>
           </div>
           <StatusStamp variant={aiConnected ? "approved" : "cold"}>
             {aiConnected ? "CONNECTED" : "NOT CONNECTED"}
@@ -191,14 +253,14 @@ export default async function AiSettingsPage({
 
         <div className="mt-4">
           {serverKey ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[62ch] text-sm leading-6 text-muted-foreground">
               This workspace is already set up with a key configured on the
               server, so there is nothing to connect here.
             </p>
           ) : (
             <>
               {!ai?.hasKey ? (
-                <p className="mb-4 max-w-[68ch] text-sm text-muted-foreground">
+                <p className="mb-4 max-w-[62ch] text-sm leading-6 text-muted-foreground">
                   Until you connect a provider, drafts are written from your
                   activity facts using built-in templates. Connecting one adds
                   richer, brand-voice writing.
@@ -218,23 +280,41 @@ export default async function AiSettingsPage({
       </section>
 
       {/* ── Connectors ────────────────────────────────────────────────── */}
-      <section aria-labelledby="connectors-heading">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 id="connectors-heading" className="text-base font-bold">
+      <section id="connectors" aria-labelledby="connectors-heading" className="scroll-mt-20">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          <div className="min-w-0">
+            <h2 id="connectors-heading" className="text-[17px] font-bold tracking-[-0.02em]">
               Connectors
             </h2>
-            <p className="mt-0.5 max-w-[62ch] text-xs leading-5 text-muted-foreground">
+            <p className="mt-1 max-w-[62ch] text-[13px] leading-5 text-muted-foreground">
               Link the accounts your marketing runs through. Each one is checked
               with the provider before it is saved, so connected means it works.
             </p>
           </div>
-          <p className="dateline">
-            {connectedCount} of 4 connected
-          </p>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <p className="dateline tabular-nums">
+              {connectedCount} of 5 connected
+            </p>
+            <div
+              className="flex items-center gap-1"
+              role="img"
+              aria-label={`${connectedCount} of 5 connectors connected`}
+            >
+              {Array.from({ length: 5 }, (_, i) => (
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className={cn(
+                    "h-1.5 w-7 rounded-full",
+                    i < connectedCount ? "bg-emerald-500" : "bg-border"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="mt-3 grid gap-3">
+        <div className="mt-4 grid gap-4">
           <BufferConnector
             connected={buffer.connected}
             envConfigured={buffer.envConfigured}
@@ -243,6 +323,8 @@ export default async function AiSettingsPage({
           />
 
           <WordPressSettingsForm initial={wordpress} />
+
+          <StrapiSettingsForm initial={strapi} />
 
           <GoogleAnalyticsSettingsForm initial={googleAnalytics} />
 
@@ -258,18 +340,18 @@ export default async function AiSettingsPage({
             }
           >
             {canManageConnectors ? (
-              <p className="text-xs leading-5 text-muted-foreground">
+              <p className="text-[13px] leading-5 text-muted-foreground">
                 Resend is set up on the{" "}
                 <Link
                   href="/email"
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="inline-flex min-h-9 items-center rounded-md px-1 text-[13px] font-semibold text-primary underline-offset-4 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Email page
                 </Link>
                 , where you also pick the verified sender and webhook.
               </p>
             ) : (
-              <p className="text-xs leading-5 text-muted-foreground">
+              <p className="text-[13px] leading-5 text-muted-foreground">
                 {resendConnected
                   ? "Connected and ready. Only opted-in, unsuppressed contacts are included."
                   : "An owner, admin or marketing manager needs to connect the email provider on the Email page."}
@@ -282,25 +364,25 @@ export default async function AiSettingsPage({
       {otherIntegrations.length > 0 ? (
         <section
           aria-labelledby="other-connections-heading"
-          className="slip px-5 py-4 sm:px-6"
+          className="slip px-5 py-5 sm:px-6"
         >
-          <h2 id="other-connections-heading" className="text-base font-bold">
+          <h2 id="other-connections-heading" className="text-[13px] font-bold tracking-[-0.01em]">
             Other connections
           </h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
             Workspace services that don&apos;t need setup here.
           </p>
-          <ul className="ledger mt-3 border-t border-border">
+          <ul className="ledger mt-3 border-t border-border/80">
             {otherIntegrations.map((row) => (
               <li
                 key={row.key}
                 className="flex items-center justify-between gap-3 py-3"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
+                  <p className="truncate text-sm font-semibold tracking-[-0.01em]">
                     {row.display_name || row.key}
                   </p>
-                  <p className="dateline mt-0.5">
+                  <p className="dateline mt-0.5 tabular-nums">
                     Updated {new Date(row.updated_at).toLocaleDateString("en-GB")}
                   </p>
                 </div>

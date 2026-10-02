@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { StatusStamp } from "@/components/ui/status-stamp";
 
 /**
@@ -23,18 +24,23 @@ export function ConnectorCard({
   children: ReactNode;
 }) {
   return (
-    <section className="slip flex flex-col px-5 py-4 sm:px-6">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
+    <section className="slip flex flex-col px-5 py-5 sm:px-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-3.5">
           <span
             aria-hidden="true"
-            className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-muted/40 text-muted-foreground [&_svg]:size-4"
+            className={cn(
+              "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border [&_svg]:size-4",
+              connected
+                ? "border-emerald-600/20 bg-emerald-600/5 text-emerald-700 dark:text-emerald-400"
+                : "border-border bg-muted/40 text-muted-foreground"
+            )}
           >
             {icon}
           </span>
           <div className="min-w-0">
-            <h3 className="text-sm font-bold">{title}</h3>
-            <p className="mt-0.5 max-w-[54ch] text-xs leading-5 text-muted-foreground">
+            <h3 className="text-[15px] font-bold tracking-[-0.01em]">{title}</h3>
+            <p className="mt-1 max-w-[54ch] text-[13px] leading-5 text-muted-foreground">
               {blurb}
             </p>
             {badge ? <p className="dateline mt-1.5">{badge}</p> : null}
@@ -44,7 +50,7 @@ export function ConnectorCard({
           {connected ? "CONNECTED" : "NOT CONNECTED"}
         </StatusStamp>
       </div>
-      <div className="mt-3.5 border-t border-border pt-3.5">{children}</div>
+      <div className="mt-4 border-t border-border/80 pt-4">{children}</div>
     </section>
   );
 }

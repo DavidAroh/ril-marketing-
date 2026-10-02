@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { publicLandingPagePath } from "@/lib/landing-page-url";
 import { requireOrganizationId } from "@/lib/supabase/organization";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -58,7 +59,7 @@ function revalidateSeo(assetId: string) {
   revalidatePath(`/library/${assetId}`);
 }
 
-export async function analyzeSeoAsset(assetId: string, _previous: Result | null, _formData: FormData): Promise<Result> {
+export async function analyzeSeoAsset(assetId: string, ...[,]: [Result | null, FormData]): Promise<Result> {
   try {
     const organizationId = await requireOrganizationId();
     const parsedId = idSchema.safeParse(assetId);
@@ -73,10 +74,10 @@ export async function analyzeSeoAsset(assetId: string, _previous: Result | null,
     if (asset.format !== "blog" && asset.channel !== "website") return { ok: false, error: "SEO analysis is available for website and blog drafts." };
 
     const [links, brand] = await Promise.all([
-      supabase.from("landing_pages").select("slug,title,headline").eq("organization_id", organizationId).eq("status", "published").limit(100),
+      supabase.from("landing_pages").select("id,slug,title,headline").eq("organization_id", organizationId).eq("status", "published").limit(100),
       getBrandGuidance(organizationId, `${asset.title}\n${asset.topic ?? ""}`).catch(() => [] as string[]),
     ]);
-    const linkOptions = (links.data ?? []).map((page) => ({ label: page.title || page.headline, path: `/p/${page.slug}` }));
+    const linkOptions = (links.data ?? []).map((page) => ({ label: page.title || page.headline, path: publicLandingPagePath(page) }));
     const fallback = localSuggestions(asset);
     let audit: SeoAudit;
     try {
@@ -107,7 +108,7 @@ export async function analyzeSeoAsset(assetId: string, _previous: Result | null,
   } catch (error) { return { ok: false, error: error instanceof Error ? error.message : "Could not analyze this website draft." }; }
 }
 
-export async function applySeoMetadata(assetId: string, _previous: Result | null, _formData: FormData): Promise<Result> {
+export async function applySeoMetadata(assetId: string, ...[,]: [Result | null, FormData]): Promise<Result> {
   try {
     const organizationId = await requireOrganizationId();
     const parsedId = idSchema.safeParse(assetId);

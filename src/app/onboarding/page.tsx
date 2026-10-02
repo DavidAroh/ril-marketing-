@@ -17,11 +17,12 @@ export default async function OnboardingPage() {
   if (orgId) redirect("/dashboard");
 
   return (
-    <main id="main" className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <h1 className="sr-only">Set up your team</h1>
-      <div className="stagger w-full max-w-sm">
+    <main id="main" className="onboarding-page flex min-h-dvh items-center justify-center bg-muted/40 p-6 sm:p-8">
+      <h1 className="sr-only text-balance">Set up your team</h1>
+      <div className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-sm sm:p-8">
         <BrandLockup />
-        <OnboardingForm email={user.email ?? "unknown"} />
+        <p className="mb-5 mt-5 text-sm leading-6 text-muted-foreground">Set up the team that will capture activities, review content, and manage leads together.</p>
+        <OnboardingForm email={user.email} />
       </div>
     </main>
   );

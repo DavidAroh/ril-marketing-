@@ -11,18 +11,18 @@ export default async function NewActivityPage() {
 	const orgId = await getCallerOrganizationId();
 	if (!orgId) redirect("/onboarding");
 
-	const segments = await listSegments(orgId).catch(() => []);
+	const segments = await listSegments(orgId);
 	const supabase = await createClient();
 	const { data: campaigns } = await supabase.from("campaigns").select("id,name").eq("organization_id", orgId).order("created_at", { ascending: false }).limit(200);
 
 	return (
-		<div className="mx-auto flex w-full max-w-3xl flex-col gap-4 md:gap-6">
+		<div className="workspace-page mx-auto flex w-full max-w-3xl flex-col gap-4 md:gap-6">
 			<header>
 				<p className="dateline">New source record</p>
-				<h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+				<h1>
 					Log activity
 				</h1>
-				<p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
+				<p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
 					Describe it once. Drafts, calendar entries, and sign-up tracking all
 					build on this record.
 				</p>

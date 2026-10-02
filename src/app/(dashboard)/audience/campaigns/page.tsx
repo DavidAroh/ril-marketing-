@@ -3,7 +3,7 @@ import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listCampaignRollups } from "@/lib/audience/campaigns";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
-import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { formatDay, todayDateline } from "@/lib/format";
 import { listSegments } from "@/lib/audience/segments";
 import { CampaignCreate } from "@/components/audience/campaign-create";
 import { CampaignStatus } from "@/components/audience/campaign-status";
@@ -15,28 +15,26 @@ export const metadata: Metadata = { title: "Campaigns" };
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 export default async function CampaignsPage() {
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const campaigns = orgId
-    ? await listCampaignRollups(orgId).catch(
-        () => [] as Awaited<ReturnType<typeof listCampaignRollups>>
-      )
+    ? await listCampaignRollups(orgId)
     : [];
   const segments = orgId
-    ? await listSegments(orgId).catch(() => [])
+    ? await listSegments(orgId)
     : [];
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
       <div>
         <p className="dateline">
           {todayDateline()} · {campaigns.length} campaigns
         </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1>
           Campaigns
         </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          One workspace per initiative — segment reach, registrations, and lead
-          quality rolled up against the campaign objective.
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+          Track each initiative’s audience reach, registrations, and lead quality
+          against its objective.
         </p>
       </div>
 
@@ -49,10 +47,9 @@ export default async function CampaignsPage() {
         />
       ) : (
         <ul className="flex flex-col gap-3">
-          {campaigns.map((c, i) => (
+          {campaigns.map((c) => (
             <li key={c.id} className="slip flex flex-col gap-3 px-5 py-4 sm:px-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="dateline">{wireLabel(i)}</span>
                 <StatusStamp status={c.status} />
                 {c.segment_name ? (
                   <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-secondary-foreground">
@@ -65,7 +62,7 @@ export default async function CampaignsPage() {
               </div>
               <h2 className="text-base font-bold text-foreground">{c.name}</h2>
               <p className="text-sm leading-6 text-muted-foreground">{c.objective || "No objective recorded yet."}</p>
-              <dl className="grid gap-x-5 gap-y-2 border-t border-border pt-3 sm:grid-cols-2 lg:grid-cols-4">
+              <dl className="grid gap-x-5 gap-y-2 border-t border-border/80 pt-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div><dt className="dateline">Target audience</dt><dd className="mt-0.5 text-sm text-foreground">{c.target_audience || c.segment_name || "Not defined"}</dd></div>
                 <div><dt className="dateline">Funnel stage</dt><dd className="mt-0.5 text-sm capitalize text-foreground">{c.funnel_stage.replaceAll("_", " ")}</dd></div>
                 <div><dt className="dateline">Channels</dt><dd className="mt-0.5 text-sm text-foreground">{c.channels.length ? c.channels.map((channel)=>channel.replaceAll("_", " ")).join(", ") : "Not selected"}</dd></div>
@@ -73,7 +70,7 @@ export default async function CampaignsPage() {
               </dl>
               <CampaignStatus campaignId={c.id} status={c.status} />
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold"><Link href={`/library?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign content</Link><Link href={`/email?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign email</Link><Link href={`/audience/landing-pages?campaign=${encodeURIComponent(c.id)}`} className="-mx-1 inline-block px-1 py-1.5 text-primary underline-offset-2 hover:underline">Campaign landing pages</Link></div>
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-border pt-3 sm:grid-cols-3 lg:grid-cols-6">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-border/80 pt-3 sm:grid-cols-3 lg:grid-cols-6">
                 {[
                   { label: "Assets", value: String(c.assets) },
                   { label: "Views", value: c.views.toLocaleString() },

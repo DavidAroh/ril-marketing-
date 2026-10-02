@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getResendConfig } from "@/lib/integrations/resend";
 import { createUnsubscribeToken } from "@/lib/email/tokens";
+import { hasActiveConsent } from "@/lib/email/consent";
 
 type Delivery = { id:string; organization_id:string; campaign_id:string; lead_id:string; attempts:number; unsubscribe_token_hash:string };
 type Campaign = { id:string; organization_id:string; status:string; delivery_authorized_at:string|null; subject:string; preview_text:string; body:string; name:string };
@@ -19,25 +20,48 @@ function publicOrigin() {
 
 async function sendOne(delivery: Delivery, campaign: Campaign, lead: Lead, unsubscribeTokens: Map<string,string>) {
   const admin = createAdminClient();
-  const { data: currentCampaign } = await admin.from("email_campaigns").select("status,delivery_authorized_at").eq("organization_id", delivery.organization_id).eq("id", delivery.campaign_id).maybeSingle<{status:string;delivery_authorized_at:string|null}>();
+  const { data: currentCampaign, error: campaignError } = await admin.from("email_campaigns").select("status,delivery_authorized_at,metadata").eq("organization_id", delivery.organization_id).eq("id", delivery.campaign_id).maybeSingle<{status:string;delivery_authorized_at:string|null;metadata:Record<string,unknown>}>();
+  if (campaignError) throw new Error(`Could not recheck campaign: ${campaignError.message}`);
   if (currentCampaign?.status === "paused") {
-    await admin.from("email_campaign_deliveries").update({ status: "queued", next_attempt_at: new Date(Date.now() + 30 * 60_000).toISOString(), error: "Campaign paused before send." }).eq("id", delivery.id);
+    await admin.from("email_campaign_deliveries").update({ status: "queued", attempts: Math.max(0, delivery.attempts - 1), next_attempt_at: new Date(Date.now() + 30 * 60_000).toISOString(), error: "Campaign paused before send." }).eq("id", delivery.id);
     return "queued";
   }
   if (currentCampaign?.status !== "scheduled" || !currentCampaign.delivery_authorized_at) {
     await admin.from("email_campaign_deliveries").update({ status: "cancelled", error: "Campaign is no longer scheduled for delivery." }).eq("id", delivery.id);
     return "cancelled";
   }
+  if (currentCampaign.metadata?.nurture === true) {
+    const metadata = currentCampaign.metadata;
+    const [sequence, enrollment] = await Promise.all([
+      admin.from("nurture_sequences").select("status,created_by,approved_by").eq("organization_id", delivery.organization_id).eq("id", metadata.nurture_sequence_id).maybeSingle(),
+      admin.from("nurture_enrollments").select("status,current_step,lead_id,sequence_id").eq("organization_id", delivery.organization_id).eq("id", metadata.nurture_enrollment_id).maybeSingle(),
+    ]);
+    if (sequence.error || enrollment.error) throw new Error("Could not recheck nurture authorization.");
+    const enrolled = enrollment.data;
+    const approved = sequence.data?.approved_by && sequence.data.created_by && sequence.data.approved_by !== sequence.data.created_by;
+    const eligible = enrolled?.status === "active" && enrolled.current_step === metadata.nurture_step && enrolled.lead_id === delivery.lead_id && enrolled.sequence_id === metadata.nurture_sequence_id;
+    if (!eligible || !sequence.data || sequence.data.status === "archived") {
+      await admin.from("email_campaign_deliveries").update({ status: "cancelled", error: "Nurture enrollment is no longer eligible." }).eq("id", delivery.id);
+      return "cancelled";
+    }
+    if (sequence.data.status !== "active" || !approved) {
+      await admin.from("email_campaign_deliveries").update({ status: "queued", attempts: Math.max(0, delivery.attempts - 1), next_attempt_at: new Date(Date.now() + 30 * 60_000).toISOString(), error: "Nurture sequence is paused or awaiting approval." }).eq("id", delivery.id);
+      return "queued";
+    }
+  }
   const config = await getResendConfig(delivery.organization_id);
   if (!config) {
-    await admin.from("email_campaign_deliveries").update({ status: "queued", error: "Resend is not connected or its key cannot be decrypted.", next_attempt_at: new Date(Date.now() + 60 * 60_000).toISOString() }).eq("id", delivery.id);
+    await admin.from("email_campaign_deliveries").update({ status: "queued", attempts: Math.max(0, delivery.attempts - 1), error: "Resend is not connected or its key cannot be decrypted.", next_attempt_at: new Date(Date.now() + 60 * 60_000).toISOString() }).eq("id", delivery.id);
     return "queued";
   }
   if (!config.webhookSecret) {
-    await admin.from("email_campaign_deliveries").update({ status: "queued", error: "Configure the Resend webhook signing secret before sending.", next_attempt_at: new Date(Date.now() + 60 * 60_000).toISOString() }).eq("id", delivery.id);
+    await admin.from("email_campaign_deliveries").update({ status: "queued", attempts: Math.max(0, delivery.attempts - 1), error: "Configure the Resend webhook signing secret before sending.", next_attempt_at: new Date(Date.now() + 60 * 60_000).toISOString() }).eq("id", delivery.id);
     return "queued";
   }
-  if (!lead.email || !lead.marketing_consent || lead.email_unsubscribed_at || lead.email_suppressed_at) {
+  const { data: currentLead, error: leadError } = await admin.from("leads").select("id,organization_id,email,name,marketing_consent,email_unsubscribed_at,email_suppressed_at").eq("organization_id", delivery.organization_id).eq("id", lead.id).maybeSingle<Lead>();
+  if (leadError) throw new Error(`Could not recheck recipient: ${leadError.message}`);
+  if (currentLead) lead = currentLead;
+  if (!currentLead || !hasActiveConsent(lead)) {
     const status = lead.email_unsubscribed_at ? "unsubscribed" : "cancelled";
     await admin.from("email_campaign_deliveries").update({ status, error: "Recipient no longer has active marketing consent." }).eq("id", delivery.id);
     return status;
@@ -92,7 +116,11 @@ async function sendOne(delivery: Delivery, campaign: Campaign, lead: Lead, unsub
 export async function processEmailDeliveryBatch(options: { limit?: number; organizationId?: string; campaignId?: string } = {}) {
   const admin = createAdminClient();
   const staleBefore = new Date(Date.now() - 15 * 60_000).toISOString();
-  await admin.from("email_campaign_deliveries").update({ status: "queued", error: "Recovered an interrupted send; provider idempotency protects retries." }).eq("status", "sending").lt("updated_at", staleBefore);
+  let recovery = admin.from("email_campaign_deliveries").update({ status: "queued", error: "Recovered an interrupted send; provider idempotency protects retries." }).eq("status", "sending").lt("updated_at", staleBefore);
+  if (options.organizationId) recovery = recovery.eq("organization_id", options.organizationId);
+  if (options.campaignId) recovery = recovery.eq("campaign_id", options.campaignId);
+  const { error: recoveryError } = await recovery;
+  if (recoveryError) throw new Error(`Could not recover interrupted deliveries: ${recoveryError.message}`);
   let campaignsQuery = admin.from("email_campaigns").select("id").eq("status", "scheduled").not("delivery_authorized_at", "is", null).limit(10000);
   if (options.organizationId) campaignsQuery = campaignsQuery.eq("organization_id", options.organizationId);
   if (options.campaignId) campaignsQuery = campaignsQuery.eq("id", options.campaignId);
@@ -136,14 +164,20 @@ export async function processEmailDeliveryBatch(options: { limit?: number; organ
         await admin.from("email_campaign_deliveries").update({ status: "cancelled", error: "Campaign is no longer scheduled for delivery." }).eq("id", delivery.id);
         return "cancelled";
       }
-      return sendOne(delivery, campaign, lead, tokens);
+      try {
+        return await sendOne(delivery, campaign, lead, tokens);
+      } catch (error) {
+        console.error("Email delivery deferred", error instanceof Error ? error.message : "Delivery check failed.");
+        await admin.from("email_campaign_deliveries").update({ status: "queued", attempts: Math.max(0, delivery.attempts - 1), next_attempt_at: new Date(Date.now() + 15 * 60_000).toISOString(), error: "Delivery checks failed; retrying before sending." }).eq("id", delivery.id).eq("status", "sending");
+        return "queued";
+      }
     }));
     for (const outcome of outcomes) { if (outcome === "sent") sent++; else if (outcome === "failed") failed++; else if (outcome === "queued" || outcome === "sending") pending++; }
   }
   const claimedCampaignIds = [...new Set(claimed.map((row) => row.campaign_id))];
   for (const campaignId of claimedCampaignIds) {
-    const { count } = await admin.from("email_campaign_deliveries").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).in("status", ["queued", "sending"]);
-    if (!count) await admin.from("email_campaigns").update({ status: "sent" }).eq("id", campaignId).eq("status", "scheduled");
+    const { count, error: countError } = await admin.from("email_campaign_deliveries").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).in("status", ["queued", "sending"]);
+    if (!countError && count === 0) await admin.from("email_campaigns").update({ status: "sent" }).eq("id", campaignId).eq("status", "scheduled");
   }
   return { processed: claimed.length, sent, failed, pending };
 }

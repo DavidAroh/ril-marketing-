@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listScheduled } from "@/lib/content/assets";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
 import { CalendarGenerator } from "@/components/content/calendar-generator";
@@ -45,9 +46,9 @@ export default async function CalendarPage({
   const from = new Date(y, m - 1, 1).toISOString();
   const to = new Date(y, m, 0, 23, 59, 59, 999).toISOString();
 
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const rows = orgId
-    ? await listScheduled(orgId, from, to).catch(() => [] as Awaited<ReturnType<typeof listScheduled>>)
+    ? await listScheduled(orgId, from, to)
     : [];
 
   // Group by calendar day, day-first.
@@ -74,37 +75,32 @@ export default async function CalendarPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
-          <p className="dateline">Scheduled & published</p>
-          <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1>
             Content Calendar
           </h1>
-          <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
+          <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
             Every approved asset with a date, in the order it goes out.
           </p>
         </div>
         <div className="flex flex-wrap items-end gap-4">
         <CalendarGenerator />
         <nav aria-label="Month" className="flex items-center gap-1">
-          <Link
-            href={`/calendar?m=${prev}`}
-            className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-secondary"
-            aria-label="Previous month"
-          >
-            ←
-          </Link>
-          <span className="min-w-[10ch] px-2 text-center text-sm font-semibold">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/calendar?m=${prev}`} aria-label="Previous month">
+              ←
+            </Link>
+          </Button>
+          <span className="min-w-[10ch] px-2 text-center text-[13px] font-bold tracking-[-0.01em] tabular-nums">
             {monthLabel(month)}
           </span>
-          <Link
-            href={`/calendar?m=${next}`}
-            className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-secondary"
-            aria-label="Next month"
-          >
-            →
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/calendar?m=${next}`} aria-label="Next month">
+              →
+            </Link>
+          </Button>
         </nav>
         </div>
       </div>
@@ -113,13 +109,14 @@ export default async function CalendarPage({
         <EmptyState
           title="Nothing scheduled this month"
           description="Approved assets with a publish date land here. Move an asset to Scheduled from the library to see it on the calendar."
+          action={{ label: "Open content library", href: "/library" }}
         />
       ) : (
         <div className="flex flex-col gap-4">
           {days.map(([day, items]) => (
             <section key={day} aria-label={dayLabel(day)}>
               <p className="dateline mb-2">{dayLabel(day)}</p>
-              <ul className="ledger slip divide-y divide-border overflow-hidden">
+              <ul className="ledger slip overflow-hidden">
                 {items.map((a) => (
                   <li
                     key={a.id}
@@ -133,9 +130,12 @@ export default async function CalendarPage({
                             "No channel"}
                         </span>
                       </div>
-                      <p className="mt-1 truncate text-sm font-medium text-foreground">
+                      <Link
+                        href={`/library/${a.id}`}
+                        className="-my-1.5 mt-1 inline-block max-w-full truncate rounded py-1.5 text-sm font-semibold tracking-[-0.01em] text-foreground outline-none hover:text-primary hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring"
+                      >
                         {a.title}
-                      </p>
+                      </Link>
                     </div>
                     <span className="dateline shrink-0 tabular-nums">
                       {a.scheduled_for ? formatTime(a.scheduled_for) : "—"}

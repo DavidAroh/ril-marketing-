@@ -23,21 +23,21 @@ export default async function SegmentDetailPage({
 	if (!segment) notFound();
 
 	const [programs, insights] = await Promise.all([
-		listPrograms(orgId).catch(() => []),
-		listSegmentInsights(orgId, id).catch(() => []),
+		listPrograms(orgId),
+		listSegmentInsights(orgId, id),
 	]);
 
 	return (
-		<div className="flex flex-col gap-4 md:gap-6">
-			<header className="flex flex-wrap items-start justify-between gap-3">
+		<div className="workspace-page flex flex-col gap-4 md:gap-6">
+			<header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
 				<div>
 					<Link
 						href="/audience/segments"
-						className="dateline transition-colors hover:text-foreground"
+						className="group inline-flex min-h-9 items-center gap-1.5 rounded-md py-2 text-[13px] font-semibold text-primary outline-none transition-colors hover:text-primary/80 focus-visible:ring-2 focus-visible:ring-ring"
 					>
-						← Segments
+						<span aria-hidden="true" className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span> Segments
 					</Link>
-					<h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+					<h1>
 						{segment.name}
 					</h1>
 				</div>
@@ -69,9 +69,9 @@ export default async function SegmentDetailPage({
 								<li key={ins.id} className="py-2.5">
 									<Link
 										href={`/audience/insights/${ins.id}`}
-										className="group flex flex-col gap-1"
+										className="group flex flex-col gap-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
 									>
-										<span className="text-sm font-medium leading-snug text-foreground group-hover:text-primary">
+										<span className="text-sm font-semibold leading-snug tracking-[-0.01em] text-foreground group-hover:text-primary">
 											{ins.summary}
 										</span>
 										<StatusStamp status={ins.status} />

@@ -19,6 +19,10 @@
     {
       "path": "/api/cron/scheduled-reports",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/lead-nurture",
+      "schedule": "17 * * * *"
     }
   ]
 }

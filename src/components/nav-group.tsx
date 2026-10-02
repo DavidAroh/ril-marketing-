@@ -76,7 +76,7 @@ export function NavGroup({ label, items }: SidebarNavGroup) {
 									</>
 								) : (
 									<SidebarMenuButton asChild isActive={active} tooltip={item.title}>
-										<Link href={item.path ?? "#"}>
+										<Link href={item.path ?? "#"} aria-current={active ? "page" : undefined}>
 											{item.icon}
 											<span>{item.title}</span>
 										</Link>

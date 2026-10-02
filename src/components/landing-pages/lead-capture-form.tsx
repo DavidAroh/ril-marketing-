@@ -4,9 +4,9 @@ import { useState, useTransition, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function LeadCaptureForm({ page, slug }: {
+export function LeadCaptureForm({ page, pageKey }: {
   page: { cta_label: string; registration_url: string | null };
-  slug: string;
+  pageKey: string;
 }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
@@ -24,7 +24,7 @@ export function LeadCaptureForm({ page, slug }: {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            page: slug,
+            page: pageKey,
             email: data.get("email"),
             name: data.get("name"),
             organisation: data.get("organisation"),
@@ -48,10 +48,10 @@ export function LeadCaptureForm({ page, slug }: {
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1.5"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Name</span><Input name="name" maxLength={200} autoComplete="name" /></label>
-      <label className="flex flex-col gap-1.5"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</span><Input name="email" type="email" required maxLength={320} autoComplete="email" /></label>
-      <label className="flex flex-col gap-1.5"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Organisation</span><Input name="organisation" maxLength={200} autoComplete="organization" /></label>
-      <label className="flex flex-col gap-1.5"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">What are you interested in?</span><Input name="interest" maxLength={500} /></label>
+      <label className="flex flex-col gap-1.5"><span className="text-sm font-medium">Name</span><Input name="name" maxLength={200} autoComplete="name" /></label>
+      <label className="flex flex-col gap-1.5"><span className="text-sm font-medium">Email</span><Input name="email" type="email" required maxLength={320} autoComplete="email" /></label>
+      <label className="flex flex-col gap-1.5"><span className="text-sm font-medium">Organisation</span><Input name="organisation" maxLength={200} autoComplete="organization" /></label>
+      <label className="flex flex-col gap-1.5"><span className="text-sm font-medium">What are you interested in?</span><Input name="interest" maxLength={500} /></label>
       <label className="flex items-start gap-2 text-xs leading-5 text-muted-foreground"><input name="marketing_consent" type="checkbox" className="mt-1" /><span>Send me occasional updates about RIL programmes and events. This is optional and separate from this enquiry.</span></label>
       <p className="text-xs leading-5 text-muted-foreground">RIL will use your details to respond to this enquiry. Contact details are not sent to the AI content assistant.</p>
       {message ? <p role={error ? "alert" : "status"} className={error ? "text-sm text-destructive" : "text-sm text-emerald-700 dark:text-emerald-400"}>{message}</p> : null}

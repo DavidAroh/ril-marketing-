@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/app-shell";
+import "./workspace.css";
 
 export default async function DashboardLayout({
   children,
@@ -17,5 +18,7 @@ export default async function DashboardLayout({
     email = data.user.email ?? "";
   } catch {
     redirect("/sign-in");
-  }	return <AppShell userEmail={email}>{children}</AppShell>;
+  }
+
+  return <AppShell userEmail={email}>{children}</AppShell>;
 }

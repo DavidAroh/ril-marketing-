@@ -56,7 +56,7 @@ export function GoogleAnalyticsSettingsForm({
       {open ? (
         <form action={saveAction} className="flex flex-col gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
               GA4 property ID
               <Input
                 name="ga4PropertyId"
@@ -65,37 +65,37 @@ export function GoogleAnalyticsSettingsForm({
                 pattern="[0-9]{4,20}"
                 placeholder="123456789"
                 defaultValue={initial.propertyId}
-                className="font-normal"
+                className="h-10 rounded-lg font-normal"
               />
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[13px] font-normal leading-5 text-muted-foreground">
                 In Analytics, open Admin then Property settings. It&apos;s the
                 number at the top.
               </span>
             </label>
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
               Search Console property
               <Input
                 name="searchConsoleSiteUrl"
                 required
                 placeholder="https://example.org/"
                 defaultValue={initial.searchConsoleSiteUrl}
-                className="font-normal"
+                className="h-10 rounded-lg font-normal"
               />
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[13px] font-normal leading-5 text-muted-foreground">
                 Copy it exactly as Search Console shows it — a URL prefix or a
                 domain property like sc-domain:example.org.
               </span>
             </label>
           </div>
 
-          <details open={!connected} className="rounded-md border border-border">
-            <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
+          <details open={!connected} className="rounded-lg border border-border">
+            <summary className="cursor-pointer rounded-lg px-3 py-2.5 text-sm font-semibold tracking-[-0.01em] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
               {connected
                 ? "Advanced: replace the Google key (optional)"
                 : "Advanced: add your Google key"}
             </summary>
-            <div className="border-t border-border px-3 py-3">
-              <ol className="list-decimal space-y-1 pl-4 text-xs leading-5 text-muted-foreground">
+            <div className="border-t border-border/80 px-3 py-3">
+              <ol className="list-decimal space-y-1 pl-4 text-[13px] leading-5 text-muted-foreground">
                 <li>
                   In Google Cloud, create a service account and download its
                   JSON key file.
@@ -110,7 +110,7 @@ export function GoogleAnalyticsSettingsForm({
                 </li>
                 <li>Paste the JSON key file below.</li>
               </ol>
-              <label className="mt-3 flex flex-col gap-1.5 text-sm font-medium">
+              <label className="mt-3 flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
                 Service-account JSON key
                 <textarea
                   name="credentialsJson"
@@ -123,10 +123,10 @@ export function GoogleAnalyticsSettingsForm({
                       ? "Leave blank to keep the saved key"
                       : "Paste the complete JSON key file"
                   }
-                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 font-mono text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="w-full rounded-lg border border-input bg-transparent px-3 py-2 font-mono text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              <p className="mt-2 text-[13px] leading-5 text-muted-foreground">
                 The key is encrypted before storage. It is never included in
                 reports and never sent to your AI provider. Use a dedicated,
                 least-privilege account and revoke the key if it is ever

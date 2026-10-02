@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listInsights } from "@/lib/audience/insights";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
 import { InsightActions } from "@/components/audience/insight-actions";
-import { todayDateline, wireLabel } from "@/lib/format";
+import { todayDateline } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Audience Insights" };
 
@@ -29,15 +28,9 @@ export default async function InsightsPage({
     : "all";
   const page = Math.max(1, Number(sp.page) || 1);
 
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const result = orgId
-    ? await listInsights(orgId, { status, page }).catch(() => ({
-        insights: [],
-        total: 0,
-        page: 1,
-        pageSize: 20,
-        totalPages: 1,
-      }))
+    ? await listInsights(orgId, { status, page })
     : { insights: [], total: 0, page: 1, pageSize: 20, totalPages: 1 };
 
   const tabHref = (s: string) =>
@@ -52,32 +45,26 @@ export default async function InsightsPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
       <div>
         <p className="dateline">
           {todayDateline()} · {result.total} findings
         </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1>
           Audience Insights
         </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          AI recommends, humans decide. Only approved insights reach
-          recommendations, drafts, and reports — suppressed ones never return.
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+          Review AI findings before they enter recommendations, drafts, or
+          reports. Suppressed insights stay out.
         </p>
       </div>
 
-      <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
+      <nav aria-label="Filter by status" className="flex flex-wrap">
         {STATUSES.map((s) => (
           <Link
             key={s}
             href={tabHref(s)}
             aria-current={status === s ? "page" : undefined}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.06em] transition-colors",
-              status === s
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
-            )}
           >
             {LABELS[s]}
           </Link>
@@ -94,11 +81,10 @@ export default async function InsightsPage({
           }
         />
       ) : (
-        <ul className="flex flex-col gap-3">
-          {result.insights.map((ins, i) => (
-            <li key={ins.id} className="slip flex flex-col gap-3 px-5 py-4 sm:px-6">
+        <ul className="ledger slip overflow-hidden">
+          {result.insights.map((ins) => (
+            <li key={ins.id} className="flex flex-col gap-3 px-5 py-5 sm:px-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="dateline">{wireLabel(i)}</span>
                 <StatusStamp status={ins.status} />
                 <span className="dateline">
                   {ins.category.replace(/_/g, " ")}
@@ -111,7 +97,7 @@ export default async function InsightsPage({
               <div>
                 <Link
                   href={`/audience/insights/${ins.id}`}
-                  className="text-sm font-medium leading-6 text-foreground transition-colors hover:text-primary"
+                  className="-my-1.5 inline-block py-1.5 text-balance text-sm font-semibold leading-6 tracking-[-0.01em] text-foreground transition-colors hover:text-primary hover:underline hover:underline-offset-2"
                 >
                   {ins.summary}
                 </Link>
@@ -120,7 +106,7 @@ export default async function InsightsPage({
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[13px] leading-5 text-muted-foreground">
                   Segment: {ins.segment?.name ?? "—"} · Signal:{" "}
                   {ins.signal_strength.toLowerCase()}
                   {ins.status === "SUPPRESSED" && ins.suppression_reason
@@ -139,7 +125,7 @@ export default async function InsightsPage({
       {result.totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {result.page > 1 ? (
-            <Link href={pageHref(result.page - 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(result.page - 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               ← Previous
             </Link>
           ) : (
@@ -149,7 +135,7 @@ export default async function InsightsPage({
             Page {result.page} / {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={pageHref(result.page + 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(result.page + 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               Next →
             </Link>
           ) : (

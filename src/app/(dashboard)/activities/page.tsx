@@ -4,32 +4,32 @@ import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listActivities } from "@/lib/content/activities";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { formatDay, todayDateline } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Activities" };
 
 export default async function ActivitiesPage() {
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const activities = orgId
-    ? await listActivities(orgId).catch(() => [] as Awaited<ReturnType<typeof listActivities>>)
+    ? await listActivities(orgId)
     : [];
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
           <p className="dateline">
             {todayDateline()} · {activities.length} logged
           </p>
-          <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1>
             Activities
           </h1>
-          <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-            Everything happening at RIL — the source record every asset, campaign,
-            and lead traces back to.
+          <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+            Record the events and partnerships that inform content, campaigns,
+            and lead follow-up.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="min-h-10 rounded-lg px-4 text-[13px] font-semibold">
           <Link href="/activities/new">Log activity</Link>
         </Button>
       </div>
@@ -38,33 +38,40 @@ export default async function ActivitiesPage() {
         <EmptyState
           title="No activities yet"
           description="Log your first program, event, workshop, or partnership so AI can start turning it into marketing content."
+          action={{ label: "Log an activity", href: "/activities/new" }}
         />
       ) : (
-        <ul className="ledger slip divide-y divide-border overflow-hidden">
-          {activities.map((a, i) => (
+        <ul className="ledger slip divide-y divide-border/80 overflow-hidden">
+          {activities.map((a) => (
             <li key={a.id}>
               <Link
                 href={`/activities/${a.id}`}
-                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+                className="flex items-start justify-between gap-4 rounded-lg px-5 py-4 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6"
               >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="dateline">{wireLabel(i)}</span>
                   {a.segment ? (
                     <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-secondary-foreground">
                       {a.segment.name}
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1.5 truncate text-sm font-medium text-foreground">
+                <p className="mt-1.5 truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
                   {a.title}
                 </p>
-                <p className="mt-0.5 line-clamp-2 text-xs leading-5 text-muted-foreground">
+                <p className="mt-0.5 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
                   {a.description || "No description yet."}
                 </p>
                 {(a.speakers?.length > 0 || a.partners?.length > 0) && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {[a.speakers?.length ? `${a.speakers.length} speakers` : "", a.partners?.length ? `${a.partners.length} partners` : ""]
+                  <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+                    {[
+                      a.speakers?.length
+                        ? `${a.speakers.length} speaker${a.speakers.length === 1 ? "" : "s"}`
+                        : "",
+                      a.partners?.length
+                        ? `${a.partners.length} partner${a.partners.length === 1 ? "" : "s"}`
+                        : "",
+                    ]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listAssets } from "@/lib/content/assets";
 import { ASSET_STATUSES } from "@/lib/content/transitions";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
-import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { formatDay, todayDateline } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Content Library" };
@@ -26,7 +26,7 @@ export default async function LibraryPage({
   const activity = sp.activity ?? "all";
   const campaign = sp.campaign ?? "all";
 
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const supabase = orgId ? await createClient() : null;
   const [activityResult, campaignResult, channelResult] = supabase
     ? await Promise.all([
@@ -39,7 +39,7 @@ export default async function LibraryPage({
   const campaignOptions = (campaignResult.data ?? []) as Array<{ id: string; name: string }>;
   const channelOptions = [...new Set((channelResult.data ?? []).map((row) => row.channel).filter((v): v is string => Boolean(v)))].sort();
   const result = orgId
-    ? await listAssets(orgId, { status, page, q, channel, activityId: activity, campaignId: campaign }).catch(() => ({ assets: [], total: 0 }))
+    ? await listAssets(orgId, { status, page, q, channel, activityId: activity, campaignId: campaign })
     : { assets: [], total: 0 };
 
   const totalPages = Math.max(1, Math.ceil(result.total / 20));
@@ -68,51 +68,44 @@ export default async function LibraryPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
       <div>
         <p className="dateline">
           {todayDateline()} · {result.total} assets
         </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1>
           Content Library
         </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          Every draft, approval, and published piece — each stamped with its
-          stage in the pipeline: Idea → AI Generated → Editing → Review →
-          Approved → Scheduled → Published → Analysing.
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+          Manage drafts, review content, and keep track of everything you publish.
         </p>
       </div>
 
-      <form method="get" action="/library" className="slip grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
+      <form method="get" action="/library" className="slip grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
         {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
-        <label className="flex flex-col gap-1.5 lg:col-span-2"><span className="dateline">Search copy</span><input name="q" defaultValue={q} maxLength={200} placeholder="Title or draft text" className="h-10 rounded-md border border-input bg-background px-3 text-sm" /></label>
-        <label className="flex flex-col gap-1.5"><span className="dateline">Channel</span><select name="channel" defaultValue={channel} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All channels</option>{channelOptions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="flex flex-col gap-1.5"><span className="dateline">Source activity</span><select name="activity" defaultValue={activity} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All activities</option>{activityOptions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
-        <label className="flex flex-col gap-1.5"><span className="dateline">Campaign</span><select name="campaign" defaultValue={campaign} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All campaigns</option>{campaignOptions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <div className="flex items-center justify-end gap-3 sm:col-span-2 lg:col-span-5"><Link href="/library" className="text-sm text-muted-foreground hover:text-foreground">Clear filters</Link><button type="submit" className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">Apply filters</button></div>
+        <label className="flex flex-col gap-1.5 lg:col-span-2"><span className="dateline">Search copy</span><input name="q" defaultValue={q} maxLength={200} placeholder="Title or draft text" className="h-10 rounded-lg border border-input bg-background px-3 text-sm" /></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Channel</span><select name="channel" defaultValue={channel} className="h-10 rounded-lg border border-input bg-background px-3 text-sm"><option value="all">All channels</option>{channelOptions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Source activity</span><select name="activity" defaultValue={activity} className="h-10 rounded-lg border border-input bg-background px-3 text-sm"><option value="all">All activities</option>{activityOptions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+        <label className="flex flex-col gap-1.5"><span className="dateline">Campaign</span><select name="campaign" defaultValue={campaign} className="h-10 rounded-lg border border-input bg-background px-3 text-sm"><option value="all">All campaigns</option>{campaignOptions.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+        <div className="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-5"><Button variant="ghost" asChild><Link href="/library">Clear filters</Link></Button><Button type="submit" className="min-h-10 rounded-lg px-4 text-[13px] font-semibold">Apply filters</Button></div>
       </form>
 
-      <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
+      <nav aria-label="Filter by status" className="flex flex-wrap">
         {filters.map((f) => (
           <Link
             key={f}
             href={filterHref(f)}
             aria-current={status === f ? "page" : undefined}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.06em] transition-colors",
-              status === f
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
-            )}
+            className="capitalize"
           >
-            {f === "all" ? "All" : f.replace(/_/g, " ")}
+            {f === "all" ? "All" : f === "ai_generated" ? "AI generated" : f.replace(/_/g, " ")}
           </Link>
         ))}
       </nav>
 
       {result.assets.length === 0 ? (
         <EmptyState
-          title="Nothing here yet"
+          title="No content yet"
           description={
             status === "all"
               ? "Assets appear once you generate content from an activity or create one manually."
@@ -120,16 +113,15 @@ export default async function LibraryPage({
           }
         />
       ) : (
-        <ul className="ledger slip divide-y divide-border overflow-hidden">
-          {result.assets.map((a, i) => (
+        <ul className="ledger slip overflow-hidden">
+          {result.assets.map((a) => (
             <li key={a.id}>
               <Link
                 href={`/library/${a.id}`}
-                className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6"
+                className="flex items-start justify-between gap-4 rounded-lg px-5 py-4 outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6"
               >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="dateline">{wireLabel(i)}</span>
                   <StatusStamp status={a.status} />
                   {a.metadata?.calendar_generator === true ? (
                     <span className="rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
@@ -142,10 +134,10 @@ export default async function LibraryPage({
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1.5 truncate text-sm font-medium text-foreground">
+                <p className="mt-1.5 truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
                   {a.title}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                <p className="mt-0.5 truncate text-[13px] leading-5 text-muted-foreground">
                   {[a.channel, a.platform, a.format].filter(Boolean).join(" · ") ||
                     "No channel set"}
                 </p>
@@ -164,7 +156,7 @@ export default async function LibraryPage({
       {totalPages > 1 ? (
         <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(page - 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               ← Previous
             </Link>
           ) : (
@@ -174,7 +166,7 @@ export default async function LibraryPage({
             Page {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link href={pageHref(page + 1)} className="inline-block py-1 font-medium text-primary">
+            <Link href={pageHref(page + 1)} className="inline-flex min-h-9 items-center rounded-md py-2 font-medium text-primary outline-none hover:underline hover:underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
               Next →
             </Link>
           ) : (

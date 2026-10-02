@@ -14,7 +14,7 @@ const schema = z.object({
   name: z.string().trim().min(2, "Name needs at least 2 characters").max(120),
 });
 
-export function OnboardingForm({ email }: { email: string }) {
+export function OnboardingForm({ email }: { email?: string }) {
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
   const {
@@ -36,10 +36,9 @@ export function OnboardingForm({ email }: { email: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Set up your workspace</CardTitle>
+        <CardTitle className="text-xl">Create your workspace</CardTitle>
         <CardDescription>
-          Signed in as {email}. Create your organization to start building
-          audience intelligence.
+          {email ? `Signed in as ${email}. ` : ""}Name your organization to start recording activities and reviewing audience insights.
         </CardDescription>
       </CardHeader>
       <CardContent>

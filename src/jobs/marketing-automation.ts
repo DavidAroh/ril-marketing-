@@ -2,6 +2,8 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateRepurposing } from "@/lib/ai/provider";
 import type { GenerationContext } from "@/lib/ai/types";
+import { hasActiveConsent } from "@/lib/email/consent";
+import { firstStepPlan, type NurtureStepLite } from "@/lib/nurture/schedule";
 
 type EventRow = { id:string; organization_id:string; event_type:string; record_id:string; status:string; attempts:number };
 type Activity = { id:string; title:string; description:string|null; outcomes:string|null; speakers:string[]|null; partners:string[]|null; event_date:string|null; audience_segment_id:string|null; campaign_id:string|null; registration_url:string|null };
@@ -117,6 +119,39 @@ async function runActivityCreated(admin: ReturnType<typeof createAdminClient>, e
   return { campaignId, generatedAssets: generatedCount, emailDrafts: 1, landingPages: 1, model };
 }
 
+// Lead capture drives automated nurture. When the workspace has opted in, the
+// new lead is enrolled into every active `lead_captured` sequence whose segment
+// filter it matches — but only if it already carries active marketing consent.
+// With nurture off, the event stays deferred exactly as before.
+async function runLeadCaptured(admin: ReturnType<typeof createAdminClient>, event: EventRow) {
+  const org = event.organization_id;
+  const { data: settings } = await admin.from("nurture_settings").select("lead_capture_enabled").eq("organization_id", org).maybeSingle<{ lead_capture_enabled: boolean }>();
+  if (!settings?.lead_capture_enabled) {
+    return { deferred: true, result: { deferred: true, reason: "Lead recorded for follow-up. Automated nurture is switched off for this workspace; enable it in Nurture settings to enrol new leads." } };
+  }
+  const { data: lead } = await admin.from("leads").select("id,email,marketing_consent,email_unsubscribed_at,email_suppressed_at,audience_segment_id").eq("organization_id", org).eq("id", event.record_id).maybeSingle<{ id: string; email: string | null; marketing_consent: boolean; email_unsubscribed_at: string | null; email_suppressed_at: string | null; audience_segment_id: string | null }>();
+  if (!lead) return { deferred: false, result: { enrolled: 0, reason: "Lead no longer exists." } };
+  if (!hasActiveConsent(lead)) {
+    return { deferred: true, result: { deferred: true, reason: "Lead recorded, but it has no active marketing consent, so it was not enrolled in any nurture sequence." } };
+  }
+  const { data: sequences } = await admin.from("nurture_sequences").select("id,name,audience_segment_id").eq("organization_id", org).eq("status", "active").eq("trigger", "lead_captured");
+  const eligible = (sequences ?? []).filter((seq) => !seq.audience_segment_id || seq.audience_segment_id === lead.audience_segment_id);
+  if (!eligible.length) return { deferred: false, result: { enrolled: 0, reason: "No active lead-capture sequence matches this lead." } };
+  const now = new Date();
+  const enrolled: string[] = [];
+  for (const seq of eligible) {
+    const { data: stepRows } = await admin.from("nurture_steps").select("step_order,delay_hours").eq("organization_id", org).eq("sequence_id", seq.id).order("step_order", { ascending: true });
+    const plan = firstStepPlan((stepRows ?? []) as NurtureStepLite[], now);
+    if (!plan) continue; // sequence has no steps yet — nothing to schedule
+    const { data: inserted } = await admin.from("nurture_enrollments").upsert(
+      [{ organization_id: org, sequence_id: seq.id, lead_id: lead.id, status: "active", current_step: plan.current_step, next_run_at: plan.next_run_at }],
+      { onConflict: "sequence_id,lead_id", ignoreDuplicates: true }
+    ).select("id");
+    if (inserted?.length) enrolled.push(seq.name);
+  }
+  return { deferred: false, result: { enrolled: enrolled.length, sequences: enrolled } };
+}
+
 export async function processMarketingAutomation(limit = 2) {
   const admin = createAdminClient();
   const { data: events, error } = await admin.from("automation_events").select("id,organization_id,event_type,record_id,status,attempts").in("status", ["queued", "failed"]).lt("attempts", 5).order("created_at", { ascending: true }).limit(Math.max(1, Math.min(limit, 10)));
@@ -127,9 +162,11 @@ export async function processMarketingAutomation(limit = 2) {
     if (!claimed) continue;
     try {
       if (event.event_type === "lead_captured") {
-        const result = { deferred: true, reason: "Lead is already recorded for follow-up. Email nurture is held until a delivery provider and consent-safe workflow are configured." };
-        await admin.from("automation_events").update({ status: "deferred", result, processed_at: new Date().toISOString() }).eq("id", event.id).eq("status", "processing");
-        results.push({ id: event.id, status: "deferred", result });
+        const { deferred, result } = await runLeadCaptured(admin, event);
+        const status = deferred ? "deferred" : "completed";
+        const { error: finishError } = await admin.from("automation_events").update({ status, result, processed_at: new Date().toISOString() }).eq("id", event.id).eq("status", "processing");
+        if (finishError) throw new Error(finishError.message);
+        results.push({ id: event.id, status, result });
         continue;
       }
       if (event.event_type !== "activity_created") throw new Error(`Unsupported event: ${event.event_type}`);

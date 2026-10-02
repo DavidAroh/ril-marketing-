@@ -13,7 +13,7 @@ const rilSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.renaissancelabs.org"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.renaissancelabs.org"),
   title: {
     default: "RIL Audience Intelligence",
     template: "%s · RIL Audience Intelligence",

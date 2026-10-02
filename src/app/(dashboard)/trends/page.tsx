@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { getCallerOrganizationId } from "@/lib/supabase/organization";
 import { listTrends } from "@/lib/content/trends";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusStamp } from "@/components/ui/status-stamp";
-import { formatDay, todayDateline, wireLabel } from "@/lib/format";
+import { formatDay, todayDateline } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRole } from "@/lib/audience/access";
 import { TrendMonitorControls } from "@/components/content/trend-monitor-controls";
@@ -32,9 +31,9 @@ export default async function TrendsPage({
     ? (sp.status as string)
     : "all";
 
-  const orgId = await getCallerOrganizationId().catch(() => null);
+  const orgId = await getCallerOrganizationId();
   const trends = orgId
-    ? await listTrends(orgId, status).catch(() => [] as Awaited<ReturnType<typeof listTrends>>)
+    ? await listTrends(orgId, status)
     : [];
   let monitoringEnabled = false;
   let lastSyncedAt: string | null = null;
@@ -57,36 +56,29 @@ export default async function TrendsPage({
     s === "all" ? "/trends" : `/trends?status=${s}`;
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="workspace-page flex flex-col gap-4 md:gap-6">
       <div>
         <p className="dateline">
           {todayDateline()} · {trends.length} signals
         </p>
-        <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1>
           Trends
         </h1>
-        <p className="mt-1 max-w-[68ch] text-sm text-muted-foreground">
-          Industry and sector developments worth turning into RIL content —
-          each with its source, suggested angle, and risk note. Unverified
-          information is never presented as fact.
+        <p className="mt-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+          Review sourced industry developments, suggested angles, and risk
+          notes before creating content.
         </p>
       </div>
 
       {canManageMonitoring ? <TrendMonitorControls enabled={monitoringEnabled} lastSyncedAt={lastSyncedAt} /> : null}
       <TrendCreateForm />
 
-      <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
+      <nav aria-label="Filter by status" className="flex flex-wrap">
         {STATUSES.map((s) => (
           <Link
             key={s}
             href={tabHref(s)}
             aria-current={status === s ? "page" : undefined}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.06em] transition-colors",
-              status === s
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
-            )}
           >
             {LABELS[s]}
           </Link>
@@ -103,12 +95,11 @@ export default async function TrendsPage({
           }
         />
       ) : (
-        <ul className="ledger slip divide-y divide-border overflow-hidden">
-          {trends.map((t, i) => (
+        <ul className="ledger slip divide-y divide-border/80 overflow-hidden">
+          {trends.map((t) => (
             <li key={t.id} className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="dateline">{wireLabel(i)}</span>
                   <StatusStamp status={t.status} />
                   {t.source ? (
                     t.source_url ? (
@@ -125,7 +116,7 @@ export default async function TrendsPage({
                     )
                   ) : null}
                 </div>
-                <p className="mt-1.5 text-sm font-medium leading-6 text-foreground">
+                <p className="mt-1.5 text-sm font-semibold tracking-[-0.01em] leading-6 text-foreground">
                   {t.title}
                 </p>
                 {t.angle ? (
@@ -133,15 +124,15 @@ export default async function TrendsPage({
                     Angle: {t.angle}
                   </p>
                 ) : null}
-                {t.relevance ? <p className="mt-1 text-xs leading-5 text-muted-foreground">RIL relevance: {t.relevance}</p> : null}
-                {t.audience ? <p className="mt-1 text-xs text-muted-foreground">Audience: {t.audience}</p> : null}
+                {t.relevance ? <p className="mt-1 text-[13px] leading-5 text-muted-foreground">RIL relevance: {t.relevance}</p> : null}
+                {t.audience ? <p className="mt-1 text-[13px] leading-5 text-muted-foreground">Audience: {t.audience}</p> : null}
                 {t.summary ? <div className="mt-2"><p className="dateline">Publisher summary · verify before reuse</p><p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">{t.summary}</p></div> : null}
                 {t.risk ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
                     Risk note: {t.risk}
                   </p>
                 ) : null}
-                {t.analysis_status === "unanalysed" ? <p className="mt-1 text-xs font-medium text-amber-700 dark:text-amber-400">AI analysis unavailable · verify claims before use</p> : null}
+                {t.analysis_status === "unanalysed" ? <p className="mt-1 text-[13px] leading-5 font-medium text-amber-700 dark:text-amber-400">AI analysis unavailable · verify claims before use</p> : null}
                 <TrendWorkflowActions trendId={t.id} status={t.status} segments={segments} />
               </div>
               <div className="shrink-0 text-right"><p className="dateline tabular-nums">{formatDay(t.source_published_at ?? t.created_at)}</p>{t.source_published_at ? <p className="dateline mt-1">Published</p> : null}</div>

@@ -38,7 +38,7 @@ export function WordPressSettingsForm({
   }, [save?.ok]);
 
   const fieldClass =
-    "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+    "h-10 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   return (
     <ConnectorCard
@@ -54,7 +54,7 @@ export function WordPressSettingsForm({
     >
       {open ? (
         <form action={saveAction} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
             Your WordPress address
             <Input
               name="siteUrl"
@@ -63,24 +63,24 @@ export function WordPressSettingsForm({
               autoComplete="url"
               placeholder="https://example.org"
               defaultValue={initial.siteUrl}
-              className="font-normal"
+              className="h-10 rounded-lg font-normal"
             />
           </label>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
               WordPress username
               <Input
                 name="username"
                 required
                 autoComplete="username"
                 defaultValue={initial.username}
-                className="font-normal"
+                className="h-10 rounded-lg font-normal"
               />
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[13px] font-normal leading-5 text-muted-foreground">
                 The account that will publish the posts.
               </span>
             </label>
-            <label className="flex flex-col gap-1.5 text-sm font-medium">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold tracking-[-0.01em]">
               Application password
               <input
                 name="applicationPassword"
@@ -93,13 +93,13 @@ export function WordPressSettingsForm({
                 }
                 className={fieldClass}
               />
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[13px] font-normal leading-5 text-muted-foreground">
                 Create one in your WordPress profile under{" "}
                 <a
                   href="https://wordpress.org/documentation/article/application-passwords/"
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="inline-flex min-h-9 items-center rounded-md px-1 text-[13px] font-semibold text-primary underline-offset-4 outline-none transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Application Passwords
                 </a>

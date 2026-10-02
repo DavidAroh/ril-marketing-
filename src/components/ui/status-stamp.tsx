@@ -1,25 +1,38 @@
 import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/**
+ * Flatplan status stamp: a tracked uppercase word that names the gate state.
+ * Colour carries meaning, not decoration — blue fields await a decision,
+ * ink outlines are settled, red is reserved for what needs action.
+ */
 const stampVariants = cva(
-  "inline-flex items-center rounded-md border px-1.5 py-0.5 font-sans text-[0.6875rem] font-bold uppercase tracking-[0.08em] transition-colors",
+  "inline-flex items-center whitespace-nowrap rounded-[3px] border px-1.5 py-1 font-sans text-[0.625rem] font-bold uppercase leading-none tracking-[0.09em] transition-colors",
   {
     variants: {
       variant: {
-        pending: "border-flag bg-flag/5 text-flag",
-        approved: "border-emerald-600 bg-emerald-600/5 text-emerald-700 dark:border-emerald-500 dark:text-emerald-400",
-        hot: "border-red-500 bg-red-500/5 text-red-600 dark:border-red-400 dark:text-red-400",
-        warm: "border-amber-500 bg-amber-500/5 text-amber-600 dark:border-amber-400 dark:text-amber-400",
-        cold: "border-border bg-muted/50 text-muted-foreground",
-        failed: "border-destructive bg-destructive/5 text-destructive",
-        scheduled: "border-border bg-card text-foreground",
-        published: "border-emerald-600 bg-emerald-600/5 text-emerald-700 dark:border-emerald-500 dark:text-emerald-400",
-        review: "border-flag bg-flag/5 text-flag",
+        // Awaiting decision — the committed blue field.
+        pending: "border-transparent bg-flag text-flag-foreground",
+        review: "border-transparent bg-flag text-flag-foreground",
+        ai_generated: "border-transparent bg-flag text-flag-foreground",
+        active: "border-transparent bg-flag text-flag-foreground",
+        // Settled — ink outline on paper.
+        approved: "border-foreground/60 bg-card text-foreground",
+        published: "border-foreground/60 bg-card text-foreground",
+        qualified: "border-foreground/60 bg-card text-foreground",
+        scheduled: "border-foreground/30 bg-card text-foreground",
         editing: "border-border bg-card text-foreground",
-        idea: "border-border bg-muted text-muted-foreground",
-        ai_generated: "border-flag bg-flag/5 text-flag",
-        qualified: "border-emerald-600 bg-emerald-600/5 text-emerald-700 dark:border-emerald-500 dark:text-emerald-400",
-        suppressed: "border-border bg-muted text-muted-foreground",
+        converted: "border-foreground/60 bg-card text-foreground",
+        completed: "border-foreground/60 bg-card text-foreground",
+        // Urgent — the reserved red field.
+        hot: "border-transparent bg-destructive text-destructive-foreground",
+        failed: "border-transparent bg-destructive text-destructive-foreground",
+        // Intermediate and inactive — quiet paper.
+        warm: "border-foreground/35 bg-card text-foreground/85",
+        cold: "border-border bg-transparent text-muted-foreground",
+        paused: "border-border bg-transparent text-muted-foreground",
+        idea: "border-border bg-transparent text-muted-foreground",
+        suppressed: "border-border bg-transparent text-muted-foreground",
       },
     },
     defaultVariants: {
@@ -41,6 +54,7 @@ export function StatusStamp({ className, variant, status, ...props }: StatusStam
 
   return (
     <span
+      data-status={(status ?? mappedVariant ?? "pending").toLowerCase().replaceAll(" ", "_")}
       className={cn(stampVariants({ variant: mappedVariant }), className)}
       {...props}
     >
@@ -83,7 +97,7 @@ function mapStatusToVariant(status: string): StatusStampProps["variant"] {
     case "qualified":
       return "qualified";
     case "converted":
-      return "approved";
+      return "converted";
     case "suppressed":
     case "dismissed":
       return "suppressed";
@@ -92,9 +106,9 @@ function mapStatusToVariant(status: string): StatusStampProps["variant"] {
     case "paused":
       return "cold";
     case "completed":
-      return "approved";
+      return "completed";
     case "active":
-      return "pending";
+      return "active";
     default:
       return "pending";
   }
@@ -103,5 +117,7 @@ function mapStatusToVariant(status: string): StatusStampProps["variant"] {
 function formatStatusText(status: string): string {
   return status
     .replace(/[_\s]+/g, " ")
-    .toUpperCase();
+    .toLowerCase()
+    .replace(/^./, (letter) => letter.toUpperCase())
+    .replace(/^Ai /, "AI ");
 }

@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { parsePublicLandingPageKey } from "@/lib/landing-page-url";
 
 export interface LandingPage {
   id: string;
@@ -40,11 +41,18 @@ export async function getLandingPage(organizationId: string, id: string): Promis
 
 export async function getPublishedLandingPage(slug: string): Promise<LandingPage | null> {
   const admin = createAdminClient();
-  const { data, error } = await admin.from("landing_pages")
-    .select("id, organization_id, campaign_id, activity_id, audience_segment_id, slug, title, headline, body, cta_label, registration_url, meta_description, status, created_at, updated_at")
-    .eq("slug", slug).eq("status", "published").maybeSingle();
+  const pageKey = parsePublicLandingPageKey(slug);
+  const fields = "id, organization_id, campaign_id, activity_id, audience_segment_id, slug, title, headline, body, cta_label, registration_url, meta_description, status, created_at, updated_at";
+  if (pageKey) {
+    const { data, error } = await admin.from("landing_pages").select(fields)
+      .eq("status", "published").eq("id", pageKey.id).eq("slug", pageKey.slug).maybeSingle();
+    if (error) throw new Error(`Failed to load public page: ${error.message}`);
+    return (data ?? null) as LandingPage | null;
+  }
+  const { data, error } = await admin.from("landing_pages").select(fields)
+    .eq("status", "published").eq("slug", slug).limit(2);
   if (error) throw new Error(`Failed to load public page: ${error.message}`);
-  return (data ?? null) as LandingPage | null;
+  return data?.length === 1 ? data[0] as LandingPage : null;
 }
 
 export async function getLandingPageOptions(organizationId: string): Promise<{

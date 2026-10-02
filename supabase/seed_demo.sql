@@ -490,7 +490,8 @@ BEGIN
       'founder' || g || '@example.com',
       (ARRAY['Amaka Obi','Tunde Bakare','Zainab Yusuf','Chidi Okonkwo','Halima Sani',
              'Segun Adeleke','Ngozi Umeh','Bola Ajayi','Ike Nwachukwu','Rita Bassey'])[1 + (g % 10)]
-        || ' ' || g,
+        || ' ' ||
+        (ARRAY['Adeyemi','Eneh','Lawal','Danjuma','Okafor','Ogun','Bello','Uzoma','Onyeka','Fashola'])[1 + ((g - 1) / 10)],
       '+23480' || lpad((10000000 + g)::text, 8, '0'),
       (ARRAY['Northgate Logistics','Riverine Foods','Kobo Labs','Sahel Health','BrightPath Edu'])[1 + (g % 5)],
       (ARRAY['Cohort 5 seat','Cloud credits','Fundraising support','SME growth','Partnership'])[1 + (g % 5)],

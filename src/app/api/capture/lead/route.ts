@@ -3,10 +3,11 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isRegistrationToken } from "@/lib/audience/guards";
 import { scoreLead } from "@/lib/leads/scoring";
+import { getPublishedLandingPage } from "@/lib/landing-pages";
 
 const captureSchema = z.object({
   token: z.string().trim().max(64).optional().default(""),
-  page: z.string().trim().max(100).optional().default(""),
+  page: z.string().trim().max(120).optional().default(""),
   email: z.string().trim().email("A valid email is required.").max(320),
   name: z.string().trim().max(200).optional().default(""),
   phone: z.string().trim().max(40).optional().default(""),
@@ -92,17 +93,7 @@ export async function POST(request: Request) {
     }
 
     if (!organizationId && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(d.page)) {
-      const { data: page } = await admin
-        .from("landing_pages")
-        .select("id, organization_id, campaign_id, audience_segment_id")
-        .eq("slug", d.page)
-        .eq("status", "published")
-        .maybeSingle<{
-          id: string;
-          organization_id: string;
-          campaign_id: string | null;
-          audience_segment_id: string | null;
-        }>();
+      const page = await getPublishedLandingPage(d.page);
       if (page) {
         organizationId = page.organization_id;
         landingPageId = page.id;
@@ -120,19 +111,21 @@ export async function POST(request: Request) {
     }
 
     // Merge duplicates on email — never delete (§13).
-    const { data: existing } = await admin
+    const { data: existing, error: lookupError } = await admin
       .from("leads")
       .select("id")
       .eq("organization_id", organizationId)
-      .ilike("email", d.email)
+      .ilike("email", d.email.replace(/[\\%_]/g, "\\$&"))
       .limit(1)
       .maybeSingle<{ id: string }>();
+    if (lookupError) return NextResponse.json({ error: "Could not check existing lead." }, { status: 500 });
     if (existing) {
       if (d.marketingConsent) {
-        await admin.from("leads")
+        const { error: consentError } = await admin.from("leads")
           .update({ marketing_consent: true, marketing_consent_at: new Date().toISOString() })
           .eq("organization_id", organizationId)
           .eq("id", existing.id);
+        if (consentError) return NextResponse.json({ error: "Could not record consent." }, { status: 500 });
       }
       return NextResponse.json({ ok: true, leadId: existing.id, duplicate: true });
     }

@@ -1,0 +1,159 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned Matchday Board for the Command Centre redesign. Lock it, take the pick or an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Matchday Board",
+      "kicker": "THE ROLL",
+      "lineage": "football fixture boards, team sheets and league tables",
+      "thesis": "Every item is a pick: what is on the team sheet today, what kicks off when, and where the table stands.",
+      "palette": ["#ffffff", "#212120", "#177ae5", "#b3261e"],
+      "materials": ["printed team sheet", "stadium fixture board", "ruled league table"],
+      "viewport": "Masthead as the team-sheet header with dateline and kickoff line; below it the selection — today's items needing a decision, first action above the fold; the right rail lists this week's fixtures with kickoff times; KPI progress runs beneath as a ruled league table with form guide.",
+      "risk": "Football words leaking into product copy would turn structure into costume; terminology stays RIL's.",
+      "raised": [
+        { "from": "challenger-zine", "raise": "Colour is the sheet, never the mark — RIL blue appears only as whole committed fields, never as tinted icons or accents." },
+        { "from": "challenger-catalog", "raise": "Stable row codes — every item carries a visible number so it can be called out by code, not just seen." },
+        { "from": "challenger-orizuru", "raise": "Margin number rail — one strict ruled margin column indexes every row on the board." },
+        { "from": "challenger-tensegrity", "raise": "Leader-line annotations — counts are pinned to the rows they measure with hairline leaders, not floated in cards." }
+      ],
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "team-sheet masthead", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "selection: items needing a decision", "x": 0, "y": 1, "w": 8, "h": 5, "accent": true },
+          { "label": "fixture rail: this week's kickoff times", "x": 8, "y": 1, "w": 4, "h": 5 },
+          { "label": "league table: KPI standings + form", "x": 0, "y": 6, "w": 12, "h": 4 }
+        ]
+      }
+    },
+    {
+      "id": "model-pick",
+      "label": "The Flatplan",
+      "kicker": "IMPECCABLE'S PICK",
+      "lineage": "magazine flat plans and issues grids",
+      "thesis": "The whole month as one ruled grid of cells, each piece of content carrying its own state.",
+      "palette": ["#ffffff", "#212120", "#177ae5"],
+      "materials": ["printed flatplan sheet", "cell status stamps"],
+      "viewport": "One full-width plan grid where each cell is a ruled rectangle holding a status word, code and date; decision cells flag at the top-left; a thin masthead above; counts printed in the grid's gutter rather than in cards.",
+      "risk": "Familiar: a planning grid is one step from the KPI-card dashboard this redesign refuses — cells must read as printed plan, never as tiles.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "thin masthead", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "plan grid of content cells", "x": 0, "y": 1, "w": 9, "h": 9, "accent": true },
+          { "label": "gutter counts", "x": 9, "y": 1, "w": 3, "h": 9 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-teletext",
+      "label": "Teletext Service",
+      "verdict": "competitive",
+      "lineage": "broadcast teletext magazines",
+      "thesis": "The workspace as a broadcast index: numbered pages, fixed status colours, keyboard first.",
+      "palette": ["#000000", "#ffffff", "#ffff00", "#00c000"],
+      "materials": ["block mosaic", "character-cell grid"],
+      "viewport": "A 40 by 24 character lattice: section header row, numbered page rows for each queue, a status panel keyed by three-digit codes.",
+      "risk": "Retro-novelty if the cell discipline slips even slightly.",
+      "case": "Holds clarity — a rigid lattice, explicit status vocabulary and direct page addressing serve scanning; loses identification, since fixture boards are everyday objects and teletext is not.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "double-height header", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "numbered queue pages", "x": 0, "y": 1, "w": 7, "h": 9, "accent": true },
+          { "label": "status panel", "x": 7, "y": 1, "w": 5, "h": 9 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-blind",
+      "label": "Destination Blind",
+      "verdict": "competitive",
+      "lineage": "depot destination blinds and cloth roll displays",
+      "thesis": "The queue as cloth courses stepping under one fixed window; a fault stops a row mid-step.",
+      "palette": ["#0b3d2c", "#f4c400", "#f7f3e8"],
+      "materials": ["dyed duck cloth", "chrome-yellow legend"],
+      "viewport": "One fixed window inset from the trim with queued courses stepping beneath it in whole line-heights; a punched eyelet tape down the edge as the index.",
+      "risk": "One window hides as much as it shows; on a dense morning queue that can cost a scan.",
+      "case": "Holds clarity — stepped whole-row motion and a mid-row fault seam are strong queue states; loses identification, since transit cloth is not a marketing team's daily object.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "fixed window", "x": 0, "y": 0, "w": 12, "h": 2, "accent": true },
+          { "label": "stepped courses", "x": 0, "y": 2, "w": 10, "h": 8 },
+          { "label": "eyelet index tape", "x": 10, "y": 2, "w": 2, "h": 8 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-catalog",
+      "label": "Event Catalog Grid",
+      "verdict": "declined",
+      "lineage": "convention circle catalogs printed on newsprint",
+      "thesis": "Every item a postage-stamp cell in a numbered hall grid, circled in pen when picked.",
+      "palette": ["#f2efe6", "#111111", "#2b4fa2"],
+      "materials": ["newsprint", "biro marks"],
+      "viewport": "Thousands of tiny cells packed edge to edge, each with a code; picked cells circled by hand, visited ones struck through.",
+      "risk": "A grid of stamps needs imagery the workspace does not have.",
+      "case": "Loses both: niche print culture most marketing teams do not know, and thumbnail cells need pictures the queues do not carry.",
+      "kept": "Stable numbered addressing — every row call-able by code."
+    },
+    {
+      "id": "challenger-zine",
+      "label": "Copy-Shop Zine",
+      "verdict": "declined",
+      "lineage": "photocopied zine interiors",
+      "thesis": "One typed column on coloured stock; display type enlarged until the counters fill.",
+      "palette": ["#f2c14e", "#1a1a1a"],
+      "materials": ["copy-shop colour stock", "typewriter type"],
+      "viewport": "A single 65-character typed column running the full sheet, with one heading blown up until it runs off the edge.",
+      "risk": "One column cannot hold a triage board.",
+      "case": "Loses both: a single typed column cannot carry queue, schedule and table at once; print-shop colour is not this audience's daily object.",
+      "kept": "Colour is the sheet, never the mark — colour appears only as whole committed fields."
+    },
+    {
+      "id": "challenger-orizuru",
+      "label": "Fold Sequence",
+      "verdict": "declined",
+      "lineage": "paper-fold instruction sequences",
+      "thesis": "One uncut sheet passing through thirty-two numbered, discrete states.",
+      "palette": ["#d8412f", "#f6f1e7", "#222222"],
+      "materials": ["washi paper", "crease lines"],
+      "viewport": "A strict margin column of fold numbers beside square diagrams of one sheet at successive authored states.",
+      "risk": "A fold sequence is one object, not a queue.",
+      "case": "Loses both: no natural home for parallel queues or schedules, and the crane is not this audience's object.",
+      "kept": "A strict margin rail of numbers indexing every row."
+    },
+    {
+      "id": "challenger-tensegrity",
+      "label": "Force Diagram",
+      "verdict": "declined",
+      "lineage": "tensegrity engineering diagrams",
+      "thesis": "Metrics as a network of tension and compression with values pinned to nodes.",
+      "palette": ["#111111", "#d63a2f", "#e8e6e1"],
+      "materials": ["carbon rod", "engineering annotation"],
+      "viewport": "A strut network with annotated counts on leader lines and force values in monospaced labels.",
+      "risk": "A force diagram belongs to engineering, not to a morning triage.",
+      "case": "Loses both: no structure for queues, schedule or approvals, and engineering mechanics is foreign to this audience.",
+      "kept": "Hairline leader lines pinning each value to the row it measures."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "The SaaS overview executed impeccably: sidebar, four KPI cards, a chart row, a table.",
+    "palette": ["#ffffff", "#212120", "#177ae5"],
+    "materials": ["clean grid", "card surfaces"],
+    "viewport": "Left nav, a four-up KPI card row, two chart cards, and a data table below.",
+    "risk": "Indistinguishable from every competitor's dashboard by design."
+  },
+  "steer": true
+}

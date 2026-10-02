@@ -10,6 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { randomUUID } from "node:crypto";
 import { getResendConfig } from "@/lib/integrations/resend";
 import { createUnsubscribeToken, hashUnsubscribeToken } from "@/lib/email/tokens";
+import { applyActiveConsentFilter } from "@/lib/email/consent";
 import { processEmailDeliveryBatch } from "@/jobs/email-delivery";
 
 const schema = z.object({
@@ -104,7 +105,9 @@ export async function queueEmailCampaign(campaignId: string): Promise<EmailDeliv
     const recipients: Array<{ id:string; email:string }> = [];
     const seen = new Set<string>();
     for (let start = 0; start < 10000; start += 500) {
-      let query = supabase.from("leads").select("id,email", { count: start === 0 ? "exact" : undefined }).eq("organization_id", organizationId).eq("marketing_consent", true).is("email_unsubscribed_at", null).is("email_suppressed_at", null).not("email", "is", null).order("created_at", { ascending: true }).range(start, start + 499);
+      let query = applyActiveConsentFilter(
+        supabase.from("leads").select("id,email", { count: start === 0 ? "exact" : undefined }).eq("organization_id", organizationId)
+      ).order("created_at", { ascending: true }).range(start, start + 499);
       if (campaign.audience_segment_id) query = query.eq("audience_segment_id", campaign.audience_segment_id);
       const { data, error, count } = await query;
       if (error) return { ok: false, error: `Could not load opted-in recipients: ${error.message}` };

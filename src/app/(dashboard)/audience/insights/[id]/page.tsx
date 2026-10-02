@@ -40,19 +40,19 @@ export default async function InsightDetailPage({
 	];
 
 	return (
-		<div className="flex flex-col gap-4 md:gap-6">
+		<div className="workspace-page flex flex-col gap-4 md:gap-6">
 			<header>
 				<Link
 					href="/audience/insights"
-					className="dateline transition-colors hover:text-foreground"
+					className="group inline-flex min-h-9 items-center gap-1.5 rounded-md py-2 text-[13px] font-semibold text-primary outline-none transition-colors hover:text-primary/80 focus-visible:ring-2 focus-visible:ring-ring"
 				>
-					← Insights
+					<span aria-hidden="true" className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span> Insights
 				</Link>
 				<div className="mt-1.5 flex flex-wrap items-center gap-3">
 					<span className="dateline">{humanize(insight.category)}</span>
 					<StatusStamp status={insight.status} />
 				</div>
-				<h1 className="mt-1.5 max-w-[68ch] text-2xl font-bold tracking-tight sm:text-3xl">
+				<h1>
 					{insight.summary}
 				</h1>
 			</header>
@@ -98,7 +98,7 @@ export default async function InsightDetailPage({
 								</div>
 							))}
 						</div>
-						<div className="flex flex-wrap gap-6 border-t border-border px-5 py-4 sm:px-6">
+						<div className="flex flex-wrap gap-6 border-t border-border/80 px-5 py-4 sm:px-6">
 							{provenance.map((p) => (
 								<div key={p.label}>
 									<p className="tnum text-xl font-bold text-foreground">{p.n}</p>

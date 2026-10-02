@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>D — Marketing overview</title>
+<style>
+  body { margin: 0; background: #efede7; color: #191914;
+         font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .mono { font-family: Consolas, "Courier New", monospace; }
+  .page { max-width: 880px; margin: 0 auto; padding: 88px 40px 120px; }
+  .date { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase;
+          margin: 0 0 26px; }
+  h1 { font-size: 34px; font-weight: 700; letter-spacing: 0.01em; margin: 0 0 8px;
+       text-transform: uppercase; }
+  .sub { font-size: 15px; line-height: 1.55; margin: 0 0 72px; max-width: 44ch; }
+  .row { display: flex; align-items: baseline; gap: 28px; padding: 20px 0; }
+  .row .n { font-family: Consolas, "Courier New", monospace; font-size: 12px;
+            width: 34px; }
+  .row .label { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+                width: 220px; }
+  .row .what { font-size: 17px; line-height: 1.4; font-weight: 600; margin: 0;
+               flex: 1; }
+  .row .quiet { font-weight: 400; }
+  .row .act { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
+  .row .act .arrow { font-family: Consolas, "Courier New", monospace; }
+  .tallies { display: flex; gap: 64px; margin: 0 0 88px; }
+  .tallies .cell .v { font-size: 96px; font-weight: 700; letter-spacing: -0.04em;
+                      line-height: 0.9; margin: 0; }
+  .tallies .cell .l { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+                      margin: 10px 0 0; }
+  .tallies .cell .l .muted { font-weight: 400; letter-spacing: 0.12em; }
+  .rule-space { height: 48px; }
+  .colhead { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase;
+             margin: 0 0 10px; }
+  .weekline { font-size: 20px; font-weight: 600; letter-spacing: 0.01em; margin: 0; }
+  .weekline .zero { font-weight: 400; }
+  .gate { margin-top: 110px; font-size: 12px; letter-spacing: 0.24em;
+          text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <p class="date">Wednesday, 30 September 2026</p>
+    <h1>Marketing overview</h1>
+    <p class="sub">Your priorities, publishing schedule, and performance in one place.</p>
+
+    <div class="tallies">
+      <div class="cell">
+        <p class="v">3</p>
+        <p class="l">Awaiting <span class="muted">decision</span></p>
+      </div>
+      <div class="cell">
+        <p class="v">0</p>
+        <p class="l">Scheduled <span class="muted">· 30 days</span></p>
+      </div>
+      <div class="cell">
+        <p class="v">22</p>
+        <p class="l">Leads <span class="muted">captured</span></p>
+      </div>
+      <div class="cell">
+        <p class="v">11</p>
+        <p class="l">Content <span class="muted">assets</span></p>
+      </div>
+    </div>
+
+    <p class="colhead">Needs your decision</p>
+    <div class="rule-space"></div>
+
+    <div class="row">
+      <span class="n">01</span>
+      <span class="label">Approvals</span>
+      <p class="what">SME owners who attended a webinar registered for the Growth Lab at a higher rate than those reached by social alone.</p>
+      <span class="act">Review <span class="arrow">→</span></span>
+    </div>
+    <div class="row">
+      <span class="n">02</span>
+      <span class="label">Approvals</span>
+      <p class="what">Students who engaged with two or more campus posts were markedly more likely to open a later email.</p>
+      <span class="act">Review <span class="arrow">→</span></span>
+    </div>
+    <div class="row">
+      <span class="n">03</span>
+      <span class="label">Content in review</span>
+      <p class="what">Clip: the question that changed the room</p>
+      <span class="act">Open <span class="arrow">→</span></span>
+    </div>
+    <div class="row">
+      <span class="n">04</span>
+      <span class="label">Follow-up</span>
+      <p class="what">Tunde Bakare Okafor <span class="quiet">— cloud credits · instagram · score warm</span></p>
+      <span class="act">All leads <span class="arrow">→</span></span>
+    </div>
+    <div class="row">
+      <span class="n">05</span>
+      <span class="label">Publish failed</span>
+      <p class="what">Instagram post failed to publish — re-authorise the channel</p>
+      <span class="act">Review <span class="arrow">→</span></span>
+    </div>
+
+    <div class="rule-space"></div>
+    <div class="rule-space"></div>
+
+    <p class="colhead">This week · 28 Sept – 4 Oct</p>
+    <div class="rule-space"></div>
+    <p class="weekline">Mon <span class="zero">0</span> — Tue <span class="zero">0</span> — Wed <span class="zero">0</span> — Thu 1 — Fri 1 — Sat <span class="zero">0</span> — Sun <span class="zero">0</span></p>
+    <div class="rule-space"></div>
+    <p class="sub">Next up Thu 1 Oct, 14:48 · x. Dashed rows are awaiting measurements.</p>
+
+    <p class="gate">AI recommends. You approve.</p>
+  </div>
+</body>
+</html>

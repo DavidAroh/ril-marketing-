@@ -14,7 +14,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/actions/auth";
-import { UserIcon, BellIcon, LogOutIcon } from "lucide-react";
+import { SettingsIcon, ClipboardCheckIcon, LogOutIcon } from "lucide-react";
+import Link from "next/link";
 
 const fallbackUser = {
 	name: "Signed in",
@@ -53,18 +54,14 @@ export function NavUser({ email }: { email?: string }) {
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>
-						<UserIcon
-						/>
-						Profile
+					<DropdownMenuItem asChild>
+						<Link href="/settings/ai"><SettingsIcon />Workspace settings</Link>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>
-						<BellIcon
-						/>
-						Notifications
+					<DropdownMenuItem asChild>
+						<Link href="/approvals"><ClipboardCheckIcon />Approval inbox</Link>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />

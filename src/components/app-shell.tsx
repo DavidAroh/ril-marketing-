@@ -10,14 +10,14 @@ export function AppShell({
 	userEmail?: string;
 }) {
 	return (
-		<div className="overflow-hidden">
+		<div className="workspace overflow-hidden">
 			<SidebarProvider className="relative h-svh">
 				<AppSidebar />
-				<SidebarInset className="md:peer-data-[variant=inset]:ml-0">
+				<SidebarInset id="main" tabIndex={-1} className="min-w-0 bg-background">
 					<AppHeader userEmail={userEmail} />
-					<div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">
-						{children}
-					</div>
+				<div className="workspace-scroll flex flex-1 flex-col overflow-y-auto px-4 pb-12 pt-6 md:px-8 md:pt-8">
+					<div className="mx-auto w-full max-w-[1500px]">{children}</div>
+				</div>
 				</SidebarInset>
 			</SidebarProvider>
 		</div>

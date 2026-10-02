@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>H — Marketing overview</title>
+<style>
+  body { margin: 0; background: #faf7f2; color: #2b2320;
+         font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .mono { font-family: Consolas, "Courier New", monospace; }
+  .page { padding: 72px 64px 120px; }
+  .date { font-family: Consolas, "Courier New", monospace; font-size: 11px;
+          letter-spacing: 0.2em; text-transform: uppercase; color: #a08a76; }
+  h1 { font-size: 22px; font-weight: 700; text-transform: uppercase;
+       letter-spacing: 0.14em; margin: 14px 0 8px; }
+  .sub { font-size: 14px; color: #7d7469; margin: 0 0 70px; }
+  .bench { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 48px;
+           margin-bottom: 96px; }
+  .cell .ghost { font-size: 120px; font-weight: 800; letter-spacing: -0.05em;
+                 line-height: 1; color: #e9dfd2; margin: 0; }
+  .cell .ink { margin-top: -34px; position: relative; }
+  .cell .v { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; margin: 0; }
+  .cell .l { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+             color: #a08a76; margin: 4px 0 0; }
+  .colhead { font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase;
+             color: #7d7469; margin: 0 0 30px; }
+  .cols { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 72px; }
+  .item { margin-bottom: 36px; }
+  .item .st { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+              color: #c2570f; margin: 0 0 6px; }
+  .item .st.calm { color: #7d7469; }
+  .item .t { font-size: 17px; line-height: 1.4; font-weight: 600; margin: 0 0 5px; }
+  .item .m { font-size: 12px; color: #7d7469; margin: 0; }
+  .item .m b { color: #c2570f; font-weight: 700; }
+  .rail .row { margin-bottom: 30px; }
+  .rail .v { font-family: Consolas, "Courier New", monospace; font-size: 26px;
+             font-weight: 700; margin: 0; line-height: 1; }
+  .rail .l { font-size: 11px; color: #7d7469; margin: 4px 0 0; }
+  .rail .week { font-size: 14px; line-height: 2; color: #7d7469; margin: 0; }
+  .rail .week b { color: #c2570f; font-weight: 700; }
+  .rail .week .zero { color: #d4cabb; }
+  .gate { margin-top: 96px; font-size: 11px; letter-spacing: 0.26em;
+          text-transform: uppercase; color: #a08a76; }
+  .gate b { color: #c2570f; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <p class="date">Wednesday, 30 September 2026</p>
+    <h1>Marketing overview</h1>
+    <p class="sub">Your priorities, publishing schedule, and performance in one place.</p>
+
+    <div class="bench">
+      <div class="cell">
+        <p class="ghost">3</p>
+        <div class="ink">
+          <p class="v">3 awaiting</p>
+          <p class="l">Decision</p>
+        </div>
+      </div>
+      <div class="cell">
+        <p class="ghost">0</p>
+        <div class="ink">
+          <p class="v">0 scheduled</p>
+          <p class="l">Next 30 days</p>
+        </div>
+      </div>
+      <div class="cell">
+        <p class="ghost">22</p>
+        <div class="ink">
+          <p class="v">22 leads</p>
+          <p class="l">Captured</p>
+        </div>
+      </div>
+      <div class="cell">
+        <p class="ghost">11</p>
+        <div class="ink">
+          <p class="v">11 assets</p>
+          <p class="l">In library</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <p class="colhead">Needs your decision — 7 items</p>
+        <div class="item">
+          <p class="st">Pending review</p>
+          <p class="t">SME owners who attended a webinar registered for the Growth Lab at a higher rate than those reached by social alone.</p>
+          <p class="m">SME Owners · signal emerging · <b>Review</b></p>
+        </div>
+        <div class="item">
+          <p class="st">Pending review</p>
+          <p class="t">Students who engaged with two or more campus posts were markedly more likely to open a later email.</p>
+          <p class="m">University Students · signal stable · <b>Review</b></p>
+        </div>
+        <div class="item">
+          <p class="st calm">Content in review</p>
+          <p class="t">Clip: the question that changed the room</p>
+          <p class="m">Instagram · <b>Open</b></p>
+        </div>
+        <div class="item">
+          <p class="st">Publish failed</p>
+          <p class="t">Instagram post failed to publish — re-authorise the channel</p>
+          <p class="m">Opened 22 Sept 2026 · <b>Review</b></p>
+        </div>
+      </div>
+
+      <div class="rail">
+        <p class="colhead">This week · 28 Sept – 4 Oct</p>
+        <p class="week">
+          Mon <span class="zero">0</span> · Tue <span class="zero">0</span> · Wed <span class="zero">0</span> · <b>Thu 1</b> · <b>Fri 1</b> · Sat <span class="zero">0</span> · Sun <span class="zero">0</span>
+        </p>
+        <p class="l">Next up Thu 1 Oct, 14:48 · x</p>
+        <div class="row" style="margin-top: 44px;">
+          <p class="v">22</p>
+          <p class="l">Leads captured</p>
+        </div>
+        <div class="row">
+          <p class="v">11</p>
+          <p class="l">Content assets</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="gate"><b>AI recommends.</b> You approve.</p>
+  </div>
+</body>
+</html>

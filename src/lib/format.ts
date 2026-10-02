@@ -21,9 +21,9 @@ export function formatPercentDelta(value: number, digits = 1): string {
   return `${sign}${value.toFixed(digits)}%`;
 }
 
-/** Wire numbers carry every decision queue (DESIGN: "Wire 01"). */
+/** Sequential record labels used by dashboard lists. */
 export function wireLabel(index: number): string {
-  return `Wire ${String(index + 1).padStart(2, "0")}`;
+  return `Item ${String(index + 1).padStart(2, "0")}`;
 }
 
 /** Dateline date for list rows: "12 Sep 2026". */

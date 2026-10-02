@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>E — Marketing overview</title>
+<style>
+  body { margin: 0; background: #f6f2e8; color: #221f1a;
+         font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .mono { font-family: Consolas, "Courier New", monospace; }
+  .page { padding: 0 0 120px; }
+  .top { padding: 56px 72px 40px; }
+  .date { font-family: Consolas, "Courier New", monospace; font-size: 11px;
+          letter-spacing: 0.18em; text-transform: uppercase; color: #8c8271; }
+  h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.28em;
+       text-transform: uppercase; margin: 16px 0 8px; }
+  .sub { font-size: 16px; line-height: 1.5; color: #6d675c; margin: 0; }
+  .strip { padding: 0 72px; display: flex; gap: 72px; margin-bottom: 84px; }
+  .strip .s { flex: 1; }
+  .strip .v { font-family: Consolas, "Courier New", monospace; font-size: 40px;
+              font-weight: 700; letter-spacing: -0.02em; margin: 0; line-height: 1; }
+  .strip .l { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+              color: #8c8271; margin: 8px 0 0; }
+  .split { display: grid; grid-template-columns: 1.2fr 0.9fr; gap: 80px;
+           padding: 0 72px; }
+  .caps .item { margin-bottom: 42px; }
+  .caps .st { font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase;
+              margin: 0 0 8px; }
+  .caps .st .red { color: #a2321f; }
+  .caps .st .grey { color: #8c8271; }
+  .caps .t { font-size: 18px; line-height: 1.4; font-weight: 600; margin: 0 0 6px; }
+  .caps .m { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+             color: #6d675c; margin: 0; }
+  .caps .m b { color: #1d4ed8; font-weight: 700; letter-spacing: 0.16em; }
+  .human { }
+  .human .intro { font-size: 22px; line-height: 1.45; color: #221f1a; margin: 0 0 36px;
+                  max-width: 24ch; }
+  .human .row { margin-bottom: 30px; }
+  .human .what { font-size: 15px; line-height: 1.55; color: #6d675c; margin: 0 0 2px; }
+  .human .what b { color: #221f1a; font-weight: 600; }
+  .human .meta { font-family: Consolas, "Courier New", monospace; font-size: 11px;
+                 letter-spacing: 0.06em; color: #8c8271; margin: 0; }
+  .human .meta .blue { color: #1d4ed8; }
+  .gate { padding: 0 72px; margin-top: 96px; font-size: 13px; letter-spacing: 0.24em;
+          text-transform: uppercase; color: #8c8271; }
+  .gate b { color: #221f1a; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <p class="date">Wednesday, 30 September 2026</p>
+      <h1>Marketing overview</h1>
+      <p class="sub">Your priorities, publishing schedule, and performance in one place.</p>
+    </div>
+
+    <div class="strip">
+      <div class="s"><p class="v">3</p><p class="l">Awaiting decision</p></div>
+      <div class="s"><p class="v">0</p><p class="l">Scheduled · 30 days</p></div>
+      <div class="s"><p class="v">22</p><p class="l">Leads captured</p></div>
+      <div class="s"><p class="v">11</p><p class="l">Content assets</p></div>
+    </div>
+
+    <div class="split">
+      <div class="caps">
+        <div class="item">
+          <p class="st"><span class="red">Pending review</span></p>
+          <p class="t">SME owners who attended a webinar registered for the Growth Lab at a higher rate than those reached by social alone.</p>
+          <p class="m">SME Owners · Signal emerging · <b>Review</b></p>
+        </div>
+        <div class="item">
+          <p class="st"><span class="red">Pending review</span></p>
+          <p class="t">Students who engaged with two or more campus posts were markedly more likely to open a later email.</p>
+          <p class="m">University Students · Signal stable · <b>Review</b></p>
+        </div>
+        <div class="item">
+          <p class="st"><span class="grey">Content in review</span></p>
+          <p class="t">Clip: the question that changed the room</p>
+          <p class="m">Instagram · <b>Open</b></p>
+        </div>
+        <div class="item">
+          <p class="st"><span class="red">Publish failed</span></p>
+          <p class="t">Instagram post failed to publish — re-authorise the channel</p>
+          <p class="m">Opened 22 Sept 2026 · <b>Review</b></p>
+        </div>
+      </div>
+
+      <div class="human">
+        <p class="intro">Three things want your judgement. Two signals, one failed post.</p>
+        <div class="row">
+          <p class="what"><b>The Growth Lab signal.</b> SME owners who attended a webinar registered at a higher rate than those reached by social alone.</p>
+          <p class="meta">INSIGHT · SIGNAL EMERGING · <span class="blue">REVIEW</span></p>
+        </div>
+        <div class="row">
+          <p class="what"><b>The campus signal.</b> Students who engaged with two or more campus posts opened a later email.</p>
+          <p class="meta">INSIGHT · SIGNAL STABLE · <span class="blue">REVIEW</span></p>
+        </div>
+        <div class="row">
+          <p class="what"><b>The failed post.</b> Instagram needs the channel re-authorised before anything else publishes.</p>
+          <p class="meta">TASK · 22 SEPT · <span class="blue">REVIEW</span></p>
+        </div>
+      </div>
+    </div>
+
+    <p class="gate"><b>AI recommends.</b> You approve.</p>
+  </div>
+</body>
+</html>
